@@ -5,6 +5,8 @@ import FXListGrid, { FXListProps } from "./fxlistgrid";
 
 import { useSearchParams } from "next/navigation";
 
+export const runtime = 'edge';
+
 export default function Index({
 	currencies,
 	defaultResult,
