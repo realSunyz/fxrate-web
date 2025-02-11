@@ -6,7 +6,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "fxRate",
+  title: "fxRate Web NG",
   description: "Currency Exchange Rate",
 };
 

@@ -1,36 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { Select } from "flowbite-react";
 import {
+  Select,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeadCell,
   TableRow,
+  Spinner,
 } from "flowbite-react";
 import useFetchRates from "@/components/fetch";
-
-const bankMap: { [key: string]: string } = {
-  招商银行: "cmb",
-  工商银行: "icbc",
-  中国银行: "boc",
-  兴业银行: "cib",
-  兴业寰宇: "cibHuanyu",
-  浦发银行: "spdb",
-  建设银行: "ccb",
-  中信银行: "citic.cn",
-};
+import { bankMap } from "@/components/fetch";
 
 const banks = Object.keys(bankMap);
 
 export default function Component() {
   const [fromCurrency, setFromCurrency] = useState("USD");
   const [toCurrency, setToCurrency] = useState("CNY");
-  const { rates, loading, error } = useFetchRates(fromCurrency, toCurrency);
+  const { rates, error } = useFetchRates(fromCurrency, toCurrency);
   return (
-    <div className="w-full px-4">
+    <div className="flex w-full px-4 pt-6">
       <div className="container mx-auto px-4">
         <div className="mb-4 flex w-full justify-start">
           <SelectInput
@@ -78,16 +69,40 @@ export default function Component() {
                       {bank}
                     </TableCell>
                     <TableCell className="text-sm md:text-base">
-                      {loading ? "加载中..." : rate?.remit || "数据加载失败"}
+                      {rate === undefined ? (
+                        <Spinner size="sm" />
+                      ) : rate.error ? (
+                        "不适用"
+                      ) : (
+                        rate.remit
+                      )}
                     </TableCell>
                     <TableCell className="text-sm md:text-base">
-                      {loading ? "加载中..." : rate?.cash || "数据加载失败"}
+                      {rate === undefined ? (
+                        <Spinner size="sm" />
+                      ) : rate.error ? (
+                        "不适用"
+                      ) : (
+                        rate.cash
+                      )}
                     </TableCell>
                     <TableCell className="text-sm md:text-base">
-                      {loading ? "加载中..." : rate?.middle || "数据加载失败"}
+                      {rate === undefined ? (
+                        <Spinner size="sm" />
+                      ) : rate.error ? (
+                        "不适用"
+                      ) : (
+                        rate.middle
+                      )}
                     </TableCell>
                     <TableCell className="text-sm md:text-base">
-                      {loading ? "加载中..." : rate?.updated || "数据加载失败"}
+                      {rate === undefined ? (
+                        <Spinner size="sm" />
+                      ) : rate.error ? (
+                        "不适用"
+                      ) : (
+                        rate.updated
+                      )}
                     </TableCell>
                   </TableRow>
                 );
@@ -121,15 +136,20 @@ export function SelectInput({
           value={fromCurrency}
           onChange={(e) => setFromCurrency(e.target.value)}
           className="min-w-[120px] md:min-w-[150px]"
+          required
         >
-          <option value="USD">USD</option>
-          <option value="CAD">CAD</option>
-          <option value="HKD">HKD</option>
-          <option value="MOP">MOP</option>
-          <option value="EUR">EUR</option>
-          <option value="GBP">GBP</option>
-          <option value="JPY">JPY</option>
-          <option value="CNY">CNY</option>
+          <option value="USD">USD (美元)</option>
+          <option value="CAD">CAD (加元)</option>
+          <option value="HKD">HKD (港币)</option>
+          <option value="EUR">EUR (欧元)</option>
+          <option value="GBP">GBP (英镑)</option>
+          <option value="JPY">JPY (日元)</option>
+          <option value="KRW">KRW (韩国元)</option>
+          <option value="CHF">CHF (瑞士法郎)</option>
+          <option value="AUD">AUD (澳大利亚元)</option>
+          <option value="SGD">SGD (新加坡元)</option>
+          <option value="NZD">NZD (新西兰元)</option>
+          <option value="MOP">MOP (澳门元)</option>
         </Select>
       </div>
 
@@ -143,15 +163,9 @@ export function SelectInput({
           value={toCurrency}
           onChange={(e) => setToCurrency(e.target.value)}
           className="min-w-[120px] md:min-w-[150px]"
+          disabled
         >
-          <option value="CNY">CNY</option>
-          <option value="USD">USD</option>
-          <option value="CAD">CAD</option>
-          <option value="HKD">HKD</option>
-          <option value="MOP">MOP</option>
-          <option value="EUR">EUR</option>
-          <option value="GBP">GBP</option>
-          <option value="JPY">JPY</option>
+          <option value="CNY">CNY (人民币)</option>
         </Select>
       </div>
     </div>
