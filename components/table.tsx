@@ -138,18 +138,18 @@ export function SelectInput({
           className="min-w-[120px] md:min-w-[150px]"
           required
         >
-          <option value="USD">USD (美元)</option>
-          <option value="CAD">CAD (加元)</option>
-          <option value="HKD">HKD (港币)</option>
-          <option value="EUR">EUR (欧元)</option>
-          <option value="GBP">GBP (英镑)</option>
-          <option value="JPY">JPY (日元)</option>
-          <option value="KRW">KRW (韩国元)</option>
-          <option value="CHF">CHF (瑞士法郎)</option>
-          <option value="AUD">AUD (澳大利亚元)</option>
-          <option value="SGD">SGD (新加坡元)</option>
-          <option value="NZD">NZD (新西兰元)</option>
-          <option value="MOP">MOP (澳门元)</option>
+          <option value="USD">USD</option>
+          <option value="CAD">CAD</option>
+          <option value="HKD">HKD</option>
+          <option value="EUR">EUR</option>
+          <option value="GBP">GBP</option>
+          <option value="JPY">JPY</option>
+          <option value="KRW">KRW</option>
+          <option value="CHF">CHF</option>
+          <option value="AUD">AUD</option>
+          <option value="SGD">SGD</option>
+          <option value="NZD">NZD</option>
+          <option value="MOP">MOP</option>
         </Select>
       </div>
 
@@ -165,7 +165,7 @@ export function SelectInput({
           className="min-w-[120px] md:min-w-[150px]"
           disabled
         >
-          <option value="CNY">CNY (人民币)</option>
+          <option value="CNY">CNY</option>
         </Select>
       </div>
     </div>
