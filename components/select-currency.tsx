@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Check, ChevronsUpDown, ArrowRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Currencies } from "@/components/fetch"
+import * as React from "react";
+import { Check, ChevronsUpDown, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Currencies } from "@/components/fetch";
 import {
   Command,
   CommandEmpty,
@@ -12,26 +12,26 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 type SelectProps = {
-  onSelect: (currency: string) => void
-}
+  onSelect: (currency: string) => void;
+};
 
 export function SelectCurrency({ onSelect }: SelectProps) {
-  const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState("");
 
   const handleSelect = (currency: string) => {
-    setValue(currency)
-    onSelect(currency)
-    setOpen(false)
-  }
+    setValue(currency);
+    onSelect(currency);
+    setOpen(false);
+  };
 
   return (
     <div className="mb-4 flex w-full justify-start">
@@ -44,7 +44,8 @@ export function SelectCurrency({ onSelect }: SelectProps) {
             className="w-[150px] justify-between"
           >
             {value
-              ? Currencies.find((Currencies) => Currencies.value === value)?.label
+              ? Currencies.find((Currencies) => Currencies.value === value)
+                  ?.label
               : "美元"}
             <ChevronsUpDown className="opacity-50" />
           </Button>
@@ -77,14 +78,10 @@ export function SelectCurrency({ onSelect }: SelectProps) {
         </PopoverContent>
       </Popover>
       <ArrowRight className="h-6 w-6 text-muted-foreground" />
-      <Button
-          variant="outline"
-          className="w-[150px] justify-between"
-          disabled
-      >
+      <Button variant="outline" className="w-[150px] justify-between" disabled>
         人民币
         <ChevronsUpDown className="opacity-50" />
       </Button>
     </div>
-  )
+  );
 }
