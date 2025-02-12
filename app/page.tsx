@@ -5,8 +5,8 @@ export default function Home() {
   return (
     <>
       <div className="flex w-full min-w-0">
-        <div className="flex w-full px-4 mt-4">
-          <div className="container mx-auto px-4">
+        <div className="flex w-full px-4">
+          <div className="container mx-auto">
             <CurrencyTable />
           </div>
         </div>

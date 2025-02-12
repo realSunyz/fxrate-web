@@ -9,7 +9,10 @@ import { SelectCurrency } from "@/components/select-currency";
 import useFetchRates, { CurrencyData } from "@/components/fetch";
 
 export const columns: ColumnDef<CurrencyData>[] = [
-  { accessorKey: "bank", header: "银行" },
+  {
+    accessorKey: "bank",
+    header: "银行",
+  },
   {
     accessorKey: "cash",
     header: ({ column }) => {
@@ -52,7 +55,10 @@ export const columns: ColumnDef<CurrencyData>[] = [
       );
     },
   },
-  { accessorKey: "updated", header: "获取时间" },
+  {
+    accessorKey: "updated",
+    header: "获取时间",
+  },
 ];
 
 export function CurrencyTable() {
@@ -64,10 +70,10 @@ export function CurrencyTable() {
   };
 
   return (
-    <div>
+    <>
       <SelectCurrency onSelect={handleCurrencySelect} />
       <DataTable columns={columns} data={rates} />
       {error && <div className="text-red-500">{error}</div>}
-    </div>
+    </>
   );
 }
