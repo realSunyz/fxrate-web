@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { Check, ChevronsUpDown, ArrowRight } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,20 +17,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { US, CA, HK, EU, GB, JP, KR, SG, RU, CH, AE } from "country-flag-icons/react/3x2"
 
 const currencies = [
-  { value: "USD", label: "USD" },
-  { value: "CAD", label: "CAD" },
-  { value: "HKD", label: "HKD" },
-  { value: "EUR", label: "EUR" },
-  { value: "GBP", label: "GBP" },
-  { value: "JPY", label: "JPY" },
-  { value: "KRW", label: "KRW" },
-  { value: "CHF", label: "CHF" },
-  { value: "AUD", label: "AUD" },
-  { value: "SGD", label: "SGD" },
-  { value: "NZD", label: "NZD" },
-  { value: "MOP", label: "MOP" },
+  { value: "USD", label: "美元", flag: US },
+  { value: "CAD", label: "加元", flag: CA },
+  { value: "HKD", label: "港元", flag: HK },
+  { value: "EUR", label: "欧元", flag: EU },
+  { value: "GBP", label: "英镑", flag: GB },
+  { value: "JPY", label: "日元", flag: JP },
+  { value: "KRW", label: "韩元", flag: KR },
+  { value: "SGD", label: "新元", flag: SG },
+  { value: "RUB", label: "卢布", flag: RU },
+  { value: "CHF", label: "瑞郎", flag: CH },
+  { value: "AED", label: "迪拉姆", flag: AE },
 ]
 
 export function Select() {
@@ -69,6 +68,7 @@ export function Select() {
                       setOpen(false)
                     }}
                   >
+                    <currencies.flag />
                     {currencies.label}
                     <Check
                       className={cn(
@@ -89,7 +89,7 @@ export function Select() {
           className="w-[150px] justify-between"
           disabled
       >
-        CNY
+        人民币
         <ChevronsUpDown className="opacity-50" />
       </Button>
     </div>
