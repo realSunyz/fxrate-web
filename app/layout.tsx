@@ -40,7 +40,7 @@ export default function RootLayout({
       </head>
       <body
           className={cn(
-            "min-h-svh bg-background font-sans antialiased",
+            "bg-background font-sans antialiased",
             GeistSans.variable,
             GeistMono.variable
           )}
@@ -52,14 +52,10 @@ export default function RootLayout({
             disableTransitionOnChange
             enableColorScheme
         >
-          <div vaul-drawer-wrapper="">
-            <div className="relative flex min-h-svh flex-col bg-background">
-              <div data-wrapper="" className="border-grid flex flex-1 flex-col">
-                <NavBar />
-                <main className="flex flex-1 flex-col">{children}</main>
-              </div>
-            </div>
-          </div>
+          <NavBar />
+          <main>
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>
