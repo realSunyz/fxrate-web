@@ -1,5 +1,5 @@
 import { ModeSwitcher } from "@/components/mode-switcher";
-import { Select } from "@/components/currency-table";
+import { CurrencyTable } from "@/components/currency-table";
 
 export default function Home() {
   return (
@@ -7,7 +7,7 @@ export default function Home() {
       <div className="flex w-full min-w-0">
         <div className="flex w-full px-4 mt-4">
           <div className="container mx-auto px-4">
-            <Select />
+            <CurrencyTable />
           </div>
         </div>
       </div>
