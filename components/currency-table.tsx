@@ -14,7 +14,7 @@ export const columns: ColumnDef<CurrencyData>[] = [
     header: "银行",
   },
   {
-    accessorKey: "cash",
+    accessorKey: "remit",
     header: ({ column }) => {
       return (
         <Button
@@ -28,7 +28,7 @@ export const columns: ColumnDef<CurrencyData>[] = [
     },
   },
   {
-    accessorKey: "remit",
+    accessorKey: "cash",
     header: ({ column }) => {
       return (
         <Button

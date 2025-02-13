@@ -48,8 +48,8 @@ export const Currencies = [
 
 export type CurrencyData = {
   bank: string;
-  cash: number;
   remit: number;
+  cash: number;
   middle: number;
   updated: string;
 };
@@ -73,16 +73,16 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
             const data = await response.json();
             tempRates.push({
               bank: bankName,
-              cash: data.cash,
               remit: data.remit,
+              cash: data.cash,
               middle: data.middle,
               updated: data.updated,
             });
           } catch (err) {
             tempRates.push({
               bank: bankName,
-              cash: 0,
               remit: 0,
+              cash: 0,
               middle: 0,
               updated: "无法获取数据",
             });
