@@ -23,6 +23,29 @@ export const metadata: Metadata = {
   keywords: siteConfig.keywords,
   icons: siteConfig.icons,
   manifest: `${siteConfig.url}/site.webmanifest`,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    siteName: siteConfig.title,
+    images: [
+      {
+        url: `${siteConfig.url}/og.png`,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.title,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: `${siteConfig.url}/og.png`,
+    creator: "@AS150289",
+  },
 };
 
 export const viewport: Viewport = {
