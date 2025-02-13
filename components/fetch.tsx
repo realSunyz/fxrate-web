@@ -48,56 +48,78 @@ export const Currencies = [
 
 export type CurrencyData = {
   bank: string;
-  remit: number;
-  cash: number;
-  middle: number;
-  updated: string;
+  remit: number | null;
+  cash: number | null;
+  middle: number | null;
+  updated: string | null;
 };
 
 const useFetchRates = (fromCurrency: string, toCurrency: string) => {
   const [rates, setRates] = useState<CurrencyData[]>([]);
   const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchRates = async () => {
-      const tempRates: CurrencyData[] = [];
-      try {
-        for (const [bankName, bankCode] of Object.entries(bankMap)) {
-          try {
-            const response = await fetch(
-              `${API_BASE_URL}/${bankCode}/${fromCurrency}/${toCurrency}`
-            );
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            tempRates.push({
-              bank: bankName,
-              remit: data.remit,
-              cash: data.cash,
-              middle: data.middle,
-              updated: data.updated,
-            });
-          } catch (err) {
-            tempRates.push({
-              bank: bankName,
-              remit: 0,
-              cash: 0,
-              middle: 0,
-              updated: "无法获取数据",
-            });
-          }
-        }
-        setRates(tempRates);
-      } catch (error) {
-        setError("获取失败");
-      }
-    };
+    const bankNames = Object.keys(bankMap);
+    const initialRates: CurrencyData[] = bankNames.map((bank) => ({
+      bank,
+      cash: null,
+      remit: null,
+      middle: null,
+      updated: null,
+    }));
+    setRates(initialRates);
 
-    fetchRates();
+    let loadedCount = 0;
+    bankNames.forEach((bankName) => {
+      const bankCode = bankMap[bankName];
+      fetch(`${API_BASE_URL}/${bankCode}/${fromCurrency}/${toCurrency}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP 错误: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setRates((prevRates) =>
+            prevRates.map((item) =>
+              item.bank === bankName
+                ? {
+                    bank: bankName,
+                    cash: data.cash,
+                    remit: data.remit,
+                    middle: data.middle,
+                    updated: data.updated,
+                  }
+                : item
+            )
+          );
+        })
+        .catch((err) => {
+          setRates((prevRates) =>
+            prevRates.map((item) =>
+              item.bank === bankName
+                ? {
+                    bank: bankName,
+                    cash: 0,
+                    remit: 0,
+                    middle: 0,
+                    updated: "无法获取数据",
+                  }
+                : item
+            )
+          );
+        })
+        .finally(() => {
+          loadedCount++;
+          if (loadedCount === bankNames.length) {
+            setLoading(false);
+          }
+        });
+    });
   }, [fromCurrency, toCurrency]);
 
-  return { rates, error };
+  return { rates, error, loading };
 };
 
 export default useFetchRates;
