@@ -2,6 +2,16 @@ export const siteConfig = {
   title: "fxRate Web",
   description: "fxRate Web Next Generation",
   url: "https://fxrate.sunyz.dev",
+  keywords: [
+    "fxRate",
+    "fxRate Web",
+    "Currency Converter",
+  ],
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const META_THEME_COLORS = {
