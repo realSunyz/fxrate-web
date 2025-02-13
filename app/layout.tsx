@@ -52,6 +52,7 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           enableColorScheme
+          disableTransitionOnChange
         >
           <NavBar />
           <main>{children}</main>
