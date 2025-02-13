@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { siteConfig, META_THEME_COLORS } from "@/config/site";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Footer } from "@/components/footer";
 import { NavBar } from "@/components/navbar";
 
 const PingFangSC = localFont({
@@ -82,6 +83,7 @@ export default function RootLayout({
         >
           <NavBar />
           <main>{children}</main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
