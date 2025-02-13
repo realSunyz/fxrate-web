@@ -1,6 +1,6 @@
 export const siteConfig = {
   title: "fxRate Web",
-  description: "fxRate Web Next Generation",
+  description: "fxRate Web Next Generation. Compare foreign exchange rates from major Chinese banks with just one click!",
   url: "https://fxrate.sunyz.dev",
   keywords: [
     "fxRate",
