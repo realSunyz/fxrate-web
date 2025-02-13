@@ -58,22 +58,22 @@ importers:
         version: 1.0.7(tailwindcss@3.4.17)
     devDependencies:
       '@types/node':
-        specifier: ^20
-        version: 20.17.17
+        specifier: ^20.17.18
+        version: 20.17.18
       '@types/react':
-        specifier: ^19
+        specifier: ^19.0.8
         version: 19.0.8
       '@types/react-dom':
-        specifier: ^19
+        specifier: ^19.0.3
         version: 19.0.3(@types/react@19.0.8)
       postcss:
-        specifier: ^8
+        specifier: ^8.5.2
         version: 8.5.2
       tailwindcss:
-        specifier: ^3.4.1
+        specifier: ^3.4.17
         version: 3.4.17
       typescript:
-        specifier: ^5
+        specifier: ^5.7.3
         version: 5.7.3
 
 packages:
@@ -699,8 +699,8 @@ packages:
     resolution: {integrity: sha512-uvXk/U4cBiFMxt+p9/G7yUWI/UbHYbyghLCjlpWZ3mLeIZiUBSKcUnw9UnKkdRz7Z/N4UBuFLWQdJCjUe7HjvA==}
     engines: {node: '>=12'}
 
-  '@types/node@20.17.17':
-    resolution: {integrity: sha512-/WndGO4kIfMicEQLTi/mDANUu/iVUhT7KboZPdEqqHQ4aTS+3qT3U5gIqWDFV+XouorjfgGqvKILJeHhuQgFYg==}
+  '@types/node@20.17.18':
+    resolution: {integrity: sha512-9kS0opXVV3dJ+C7HPhXfDlOdMu4cjJSZhlSxlDK39IxVRxBbuiYjCkLYSO9d5UYqTd4DApxRK9T1xJiTAkfA0w==}
 
   '@types/react-dom@19.0.3':
     resolution: {integrity: sha512-0Knk+HJiMP/qOZgMyNFamlIjw9OFCsyC2ZbigmEEyXXixgre6IQpm/4V+r3qH4GC1JPvRJKInw+on2rV6YZLeA==}
@@ -1841,7 +1841,7 @@ snapshots:
 
   '@tanstack/table-core@8.21.2': {}
 
-  '@types/node@20.17.17':
+  '@types/node@20.17.18':
     dependencies:
       undici-types: 6.19.8
 
