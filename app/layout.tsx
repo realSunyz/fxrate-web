@@ -1,12 +1,20 @@
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
-
+import localFont from "next/font/local";
 import { siteConfig, META_THEME_COLORS } from "@/config/site";
 import { ThemeProvider } from "@/components/theme-provider";
-import { GeistMono } from "geist/font/mono";
-import { GeistSans } from "geist/font/sans";
 import { NavBar } from "@/components/navbar";
+
+const PingFangSC = localFont({
+  src: [
+    {
+      path: "./fonts/PingFangSC-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+});
 
 export const metadata: Metadata = {
   title: siteConfig.title,
@@ -38,18 +46,11 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={cn(
-          "bg-background font-sans antialiased",
-          GeistSans.variable,
-          GeistMono.variable
-        )}
-      >
+      <body className={cn("bg-background antialiased", PingFangSC)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange
           enableColorScheme
         >
           <NavBar />
