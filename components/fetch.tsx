@@ -11,6 +11,7 @@ import {
   RU,
   CH,
   AE,
+  TW,
 } from "country-flag-icons/react/3x2";
 
 const API_BASE_URL = "https://fxrate-api.sunyz.net/v1";
@@ -41,6 +42,7 @@ export const Currencies = [
   { value: "SGD", label: "新元", flag: SG },
   { value: "RUB", label: "卢布", flag: RU },
   { value: "CHF", label: "瑞郎", flag: CH },
+  { value: "TWD", label: "新台币", flag: TW },
   { value: "AED", label: "迪拉姆", flag: AE },
 ];
 
