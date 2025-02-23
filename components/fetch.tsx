@@ -48,8 +48,10 @@ export const Currencies = [
 
 export type CurrencyData = {
   bank: string;
-  remit: number | null;
-  cash: number | null;
+  sellRemit: number | null;
+  sellCash: number | null;
+  buyRemit: number | null;
+  buyCash: number | null;
   middle: number | null;
   updated: string | null;
 };
@@ -63,8 +65,10 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
     const bankNames = Object.keys(bankMap);
     const initialRates: CurrencyData[] = bankNames.map((bank) => ({
       bank,
-      cash: null,
-      remit: null,
+      sellRemit: null,
+      sellCash: null,
+      buyRemit: null,
+      buyCash: null,
       middle: null,
       updated: null,
     }));
@@ -73,7 +77,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
     let loadedCount = 0;
     bankNames.forEach((bankName) => {
       const bankCode = bankMap[bankName];
-      fetch(`${API_BASE_URL}/${bankCode}/${fromCurrency}/${toCurrency}`)
+      fetch(`${API_BASE_URL}/${bankCode}/${fromCurrency}/${toCurrency}?precision=2&amount=100&fees=0`)
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP 错误: ${response.status}`);
@@ -85,9 +89,9 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
             prevRates.map((item) =>
               item.bank === bankName
                 ? {
-                    bank: bankName,
-                    cash: data.cash,
-                    remit: data.remit,
+                    ...item,
+                    buyRemit: data.remit,
+                    buyCash: data.cash,
                     middle: data.middle,
                     updated: data.updated,
                   }
@@ -100,9 +104,9 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
             prevRates.map((item) =>
               item.bank === bankName
                 ? {
-                    bank: bankName,
-                    cash: 0,
-                    remit: 0,
+                    ...item,
+                    buyRemit: 0,
+                    buyCash: 0,
                     middle: 0,
                     updated: "无法获取数据",
                   }
@@ -115,6 +119,39 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
           if (loadedCount === bankNames.length) {
             setLoading(false);
           }
+        });
+      fetch(`${API_BASE_URL}/${bankCode}/${toCurrency}/${fromCurrency}?reverse=true&precision=2&amount=100&fees=0`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP 错误: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setRates((prevRates) =>
+            prevRates.map((item) =>
+              item.bank === bankName
+                ? {
+                    ...item,
+                    sellRemit: data.remit,
+                    sellCash: data.cash,
+                  }
+                : item
+            )
+          );
+        })
+        .catch((err) => {
+          setRates((prevRates) =>
+            prevRates.map((item) =>
+              item.bank === bankName
+                ? {
+                    ...item,
+                    sellRemit: 0,
+                    sellCash: 0,
+                  }
+                : item
+            )
+          );
         });
     });
   }, [fromCurrency, toCurrency]);

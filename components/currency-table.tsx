@@ -17,13 +17,13 @@ export const columns: ColumnDef<CurrencyData>[] = [
     cell: ({ cell }) => cell.getValue(),
   },
   {
-    accessorKey: "remit",
+    accessorKey: "sellRemit",
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        购汇/钞价
+        购汇价
         <ArrowUpDown className="h-4 w-4" />
       </Button>
     ),
@@ -33,13 +33,45 @@ export const columns: ColumnDef<CurrencyData>[] = [
     },
   },
   {
-    accessorKey: "cash",
+    accessorKey: "sellCash",
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        结汇/钞价
+        购钞价
+        <ArrowUpDown className="h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ cell }) => {
+      const value = cell.getValue() as number | null;
+      return value === null ? <Skeleton className="h-4 w-full" /> : value;
+    },
+  },
+  {
+    accessorKey: "buyRemit",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        结汇价
+        <ArrowUpDown className="h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ cell }) => {
+      const value = cell.getValue() as number | null;
+      return value === null ? <Skeleton className="h-4 w-full" /> : value;
+    },
+  },
+  {
+    accessorKey: "buyCash",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        结钞价
         <ArrowUpDown className="h-4 w-4" />
       </Button>
     ),
