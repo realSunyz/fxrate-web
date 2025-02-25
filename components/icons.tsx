@@ -23,7 +23,6 @@ export const Icons = {
         transform="translate(0 0)"
       >
         <g
-          aria-label="f"
           transform="translate(0 0) translate(0 0) scale(1.1) translate(-265.46694 66.24)"
         >
           <path
@@ -52,7 +51,6 @@ export const Icons = {
           />
         </g>
         <g
-          aria-label="x"
           transform="translate(0 0) translate(31.489425 20.4336) scale(1.1) translate(-294.09369 47.664)"
         >
           <path
@@ -89,7 +87,6 @@ export const Icons = {
           />
         </g>
         <g
-          aria-label="R"
           transform="translate(0 0) translate(91.53045 20.2752) scale(1.1) translate(-348.67644 47.808)"
         >
           <path
@@ -102,7 +99,6 @@ export const Icons = {
           />
         </g>
         <g
-          aria-label="a"
           transform="translate(0 0) translate(143.260425 20.2752) scale(1.1) translate(-395.70369 47.808)"
         >
           <path
@@ -131,7 +127,6 @@ export const Icons = {
           />
         </g>
         <g
-          aria-label="t"
           transform="translate(0 0) translate(205.5537 6.5736) scale(1.1) translate(-452.33394 60.264)"
         >
           <path
@@ -160,7 +155,6 @@ export const Icons = {
           />
         </g>
         <g
-          aria-label="e"
           transform="translate(0 0) translate(243.256607 20.2752) scale(1.1) translate(-486.60931 47.808)"
         >
           <path
@@ -213,7 +207,6 @@ export const Icons = {
           />
         </g>
         <g
-          aria-label="W"
           transform="translate(0 0) translate(331.760132 20.7504) scale(1.1) translate(-567.06706 47.376)"
         >
           <path
@@ -242,7 +235,6 @@ export const Icons = {
           />
         </g>
         <g
-          aria-label="e"
           transform="translate(0 0) translate(431.665982 20.2752) scale(1.1) translate(-657.89056 47.808)"
         >
           <path
@@ -295,7 +287,6 @@ export const Icons = {
           />
         </g>
         <g
-          aria-label="b"
           transform="translate(0 0) translate(491.725575 0) scale(1.1) translate(-712.49019 66.24)"
         >
           <path
