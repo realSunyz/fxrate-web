@@ -43,6 +43,7 @@ export function SelectCurrency({ onSelect }: SelectProps) {
               role="combobox"
               aria-expanded={open}
               className="w-[150px] justify-between"
+              aria-label="源货币"
             >
               {value
                 ? Currencies.find((Currencies) => Currencies.value === value)
@@ -81,7 +82,7 @@ export function SelectCurrency({ onSelect }: SelectProps) {
       </div>  
         <ArrowRight className="mx-2 text-lg" />
       <div className="flex flex-col">
-        <Button variant="outline" className="w-[150px] justify-between" disabled>
+        <Button variant="outline" className="w-[150px] justify-between" aria-label="目标货币" disabled>
           人民币
           <ChevronsUpDown className="opacity-50" />
         </Button>
