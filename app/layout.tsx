@@ -2,7 +2,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import Script from 'next/script';
+import Script from "next/script";
 import { siteConfig, META_THEME_COLORS } from "@/config/site";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Footer } from "@/components/footer";
@@ -11,7 +11,7 @@ import { NavBar } from "@/components/navbar";
 const PingFangSC = localFont({
   src: [
     {
-      path: "./fonts/PingFangSC-Regular.woff2",
+      path: "./assets/PingFangSC-Regular.woff2",
       weight: "400",
       style: "normal",
     },
@@ -62,18 +62,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                if (localStorage.theme === 'dark' || ((!('theme' in localStorage) || localStorage.theme === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                  document.querySelector('meta[name="theme-color"]').setAttribute('content', '${META_THEME_COLORS.dark}')
-                }
-              } catch (_) {}
-            `,
-          }}
+        <Script src="https://cdn.sunyz.net/assets/fxrate/themeScript.js" />
+        <Script
+          src="https://analytics.sunyz.net/script.js"
+          data-website-id="fbb4e03c-b077-4e93-9023-818b8a84c53b"
         />
-        <Script src="https://analytics.sunyz.net/script.js" data-website-id="fbb4e03c-b077-4e93-9023-818b8a84c53b" />
       </head>
       <body className={cn("bg-background antialiased", PingFangSC)}>
         <ThemeProvider
