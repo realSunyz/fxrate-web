@@ -65,7 +65,7 @@ export default function RootLayout({
         <Script src="https://cdn.sunyz.net/assets/fxrate/themeScript.js" />
         <Script
           src="https://analytics.sunyz.net/script.js"
-          data-website-id="fbb4e03c-b077-4e93-9023-818b8a84c53b"
+          data-website-id="01c3d598-8834-44f4-a3f4-d85a4330ccdb"
         />
       </head>
       <body className={cn("bg-background antialiased", PingFangSC)}>
