@@ -2,6 +2,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import Script from 'next/script';
 import { siteConfig, META_THEME_COLORS } from "@/config/site";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Footer } from "@/components/footer";
@@ -72,6 +73,7 @@ export default function RootLayout({
             `,
           }}
         />
+        <Script src="https://analytics.sunyz.net/script.js" data-website-id="fbb4e03c-b077-4e93-9023-818b8a84c53b" />
       </head>
       <body className={cn("bg-background antialiased", PingFangSC)}>
         <ThemeProvider
