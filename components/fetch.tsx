@@ -24,11 +24,12 @@ export const bankMap: { [key: string]: string } = {
   交通银行: "bocom",
   工商银行: "icbc",
   建设银行: "ccb",
-  浦发银行: "spdb",
   平安银行: "pab",
   邮储银行: "psbc",
   中信银行: "citic.cn",
   汇丰中国: "hsbc.cn",
+  银联国际: "unionpay",
+  维萨VISA: "visa",
 };
 
 export const Currencies = [
