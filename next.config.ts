@@ -4,8 +4,8 @@ const { execSync } = require('child_process');
 
 const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.sunyz.net https://analytics.sunyz.net;
-    style-src 'self' 'unsafe-inline' https://cdn.sunyz.net https://fonts.googleapis.com;
+    script-src 'self' 'unsafe-inline' https://cdn.sunyz.net https://analytics.sunyz.net https://challenges.cloudflare.com;
+    style-src 'self' 'unsafe-inline' https://cdn.sunyz.net https://fonts.googleapis.com https://challenges.cloudflare.com;
     img-src 'self' blob: data: https://cdn.sunyz.net;
     font-src 'self' https://cdn.sunyz.net https://fonts.gstatic.com;
     object-src 'none';
@@ -13,7 +13,7 @@ const cspHeader = `
     form-action 'self';
     frame-src 'none';
     frame-ancestors 'none';
-    connect-src 'self' https://fxrate-api.sunyz.net https://analytics.sunyz.net;
+    connect-src 'self' https://fxrate-api.sunyz.net https://analytics.sunyz.net https://challenges.cloudflare.com;
 `
 
 module.exports = {
@@ -45,10 +45,10 @@ module.exports = {
             key: 'X-Content-Type-Options',
             value: 'nosniff'
           },
-          {
-            key: 'Content-Security-Policy',
-            value: cspHeader.replace(/\n/g, ''),
-          },
+          // {
+          //   key: 'Content-Security-Policy',
+          //   value: cspHeader.replace(/\n/g, ''),
+          // },
         ],
       },
     ];

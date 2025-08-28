@@ -67,6 +67,7 @@ export default function RootLayout({
           src="https://analytics.sunyz.net/script.js"
           data-website-id="01c3d598-8834-44f4-a3f4-d85a4330ccdb"
         />
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
       </head>
       <body className={cn("bg-background antialiased", PingFangSC)}>
         <ThemeProvider
