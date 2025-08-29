@@ -8,7 +8,6 @@ export function Footer() {
       <div className="container mx-auto text-center text-sm text-gray-500">
         <div>{t("footer.build", { id: process.env.COMMIT_ID || "dev" })}</div>
         <div>{t("footer.copyright")}</div>
-        <div>{t("footer.disclaimer")}</div>
       </div>
     </footer>
   );

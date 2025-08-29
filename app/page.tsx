@@ -1,4 +1,5 @@
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { SettingsDialog } from "@/components/settings-dialog";
+import { DisclaimerDialog } from "@/components/disclaimer-dialog";
 import { CurrencyTable } from "@/components/currency-table";
 
 export default function Home() {
@@ -9,8 +10,9 @@ export default function Home() {
           <CurrencyTable />
         </div>
       </div>
-      <div className="fixed bottom-4 right-4 z-50">
-        <LanguageSwitcher />
+      <div className="fixed bottom-4 right-4 z-50 flex gap-2">
+        <SettingsDialog />
+        <DisclaimerDialog />
       </div>
     </>
   );
