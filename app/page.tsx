@@ -1,4 +1,4 @@
-import { ModeSwitcher } from "@/components/mode-switcher";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { CurrencyTable } from "@/components/currency-table";
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
         </div>
       </div>
       <div className="fixed bottom-4 right-4 z-50">
-        <ModeSwitcher />
+        <LanguageSwitcher />
       </div>
     </>
   );

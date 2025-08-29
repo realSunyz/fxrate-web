@@ -9,12 +9,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DataTable } from "@/components/data-table";
 import { SelectCurrency } from "@/components/select-currency";
 import useFetchRates, { CurrencyData } from "@/components/fetch";
+import { useI18n, tBankName } from "@/lib/i18n";
 
-export const columns: ColumnDef<CurrencyData>[] = [
+export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<CurrencyData>[] => [
   {
     accessorKey: "bank",
-    header: "银行",
-    cell: ({ cell }) => cell.getValue(),
+    header: t("columns.bank"),
+    cell: ({ cell }) => tBankName(String(cell.getValue() ?? ""), t),
   },
   {
     accessorKey: "sellRemit",
@@ -23,13 +24,13 @@ export const columns: ColumnDef<CurrencyData>[] = [
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        购汇价
+        {t("columns.sellRemit")}
         <ArrowUpDown className="h-4 w-4" />
       </Button>
     ),
     cell: ({ cell }) => {
       const value = cell.getValue() as number | null;
-      return value === null ? <Skeleton className="h-4 w-full" /> : value;
+      return value === null ? <Skeleton className="h-4 w-[80px] rounded-full" /> : value;
     },
   },
   // {
@@ -45,7 +46,7 @@ export const columns: ColumnDef<CurrencyData>[] = [
   //   ),
   //   cell: ({ cell }) => {
   //     const value = cell.getValue() as number | null;
-  //     return value === null ? <Skeleton className="h-4 w-full" /> : value;
+  //     return value === null ? <Skeleton className="h-4 w-[80px] rounded-full" /> : value;
   //   },
   // },
   {
@@ -55,13 +56,13 @@ export const columns: ColumnDef<CurrencyData>[] = [
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        结汇价
+        {t("columns.buyRemit")}
         <ArrowUpDown className="h-4 w-4" />
       </Button>
     ),
     cell: ({ cell }) => {
       const value = cell.getValue() as number | null;
-      return value === null ? <Skeleton className="h-4 w-full" /> : value;
+      return value === null ? <Skeleton className="h-4 w-[80px] rounded-full" /> : value;
     },
   },
   {
@@ -71,13 +72,13 @@ export const columns: ColumnDef<CurrencyData>[] = [
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        结钞价
+        {t("columns.buyCash")}
         <ArrowUpDown className="h-4 w-4" />
       </Button>
     ),
     cell: ({ cell }) => {
       const value = cell.getValue() as number | null;
-      return value === null ? <Skeleton className="h-4 w-full" /> : value;
+      return value === null ? <Skeleton className="h-4 w-[80px] rounded-full" /> : value;
     },
   },
   {
@@ -87,26 +88,28 @@ export const columns: ColumnDef<CurrencyData>[] = [
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        中间价
+        {t("columns.middle")}
         <ArrowUpDown className="h-4 w-4" />
       </Button>
     ),
     cell: ({ cell }) => {
       const value = cell.getValue() as number | null;
-      return value === null ? <Skeleton className="h-4 w-full" /> : value;
+      return value === null ? <Skeleton className="h-4 w-[80px] rounded-full" /> : value;
     },
   },
   {
     accessorKey: "updated",
-    header: "更新时间",
+    header: t("columns.updated"),
     cell: ({ cell }) => {
       const value = cell.getValue() as string | null;
-      return value === null ? <Skeleton className="h-4 w-full" /> : value;
+      if (value === null) return <Skeleton className="h-4 w-[150px] rounded-full" />;
+      return value === "无法获取数据" ? t("table.unavailable") : value;
     },
   },
 ];
 
 export function CurrencyTable() {
+  const { t } = useI18n();
   const [fromcurrency, setFromcurrency] = useState("USD");
   const { rates, error, loading } = useFetchRates(fromcurrency, "CNY");
 
@@ -117,7 +120,7 @@ export function CurrencyTable() {
   return (
     <>
       <SelectCurrency onSelect={handleCurrencySelect} />
-      <DataTable columns={columns} data={rates} />
+      <DataTable columns={columnsFactory(t)} data={rates} />
       {error && <div className="text-red-500">{error}</div>}
     </>
   );

@@ -5,8 +5,10 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import { siteConfig, META_THEME_COLORS } from "@/config/site";
 import { ThemeProvider } from "@/components/theme-provider";
+import { I18nProvider } from "@/lib/i18n";
 import { Footer } from "@/components/footer";
 import { NavBar } from "@/components/navbar";
+import { ThemeSync } from "@/components/theme-sync";
 
 const PingFangSC = localFont({
   src: [
@@ -60,27 +62,34 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="zh-Hans" suppressHydrationWarning>
       <head>
         <Script src="https://cdn.sunyz.net/assets/fxrate/themeScript.js" />
         <Script
           src="https://analytics.sunyz.net/script.js"
           data-website-id="01c3d598-8834-44f4-a3f4-d85a4330ccdb"
         />
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+        <script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          async
+          defer
+        ></script>
       </head>
       <body className={cn("bg-background antialiased", PingFangSC)}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          enableColorScheme
-          disableTransitionOnChange
-        >
-          <NavBar />
-          <main>{children}</main>
-          <Footer />
-        </ThemeProvider>
+        <I18nProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            enableColorScheme
+            disableTransitionOnChange
+          >
+            <ThemeSync />
+            <NavBar />
+            <main>{children}</main>
+            <Footer />
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );

@@ -18,12 +18,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useI18n, tCurrency } from "@/lib/i18n";
 
 type SelectProps = {
   onSelect: (currency: string) => void;
 };
 
 export function SelectCurrency({ onSelect }: SelectProps) {
+  const { t, locale } = useI18n();
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
 
@@ -43,20 +45,17 @@ export function SelectCurrency({ onSelect }: SelectProps) {
               role="combobox"
               aria-expanded={open}
               className="w-[150px] justify-between"
-              aria-label="源货币"
+              aria-label={t("select.source")}
             >
-              {value
-                ? Currencies.find((Currencies) => Currencies.value === value)
-                    ?.label
-                : "美元"}
+              {value ? tCurrency(value, t) : t("currency.USD")}
               <ChevronsUpDown className="opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[150px] p-0">
             <Command>
-              <CommandInput placeholder="搜索" />
+              <CommandInput placeholder={t("select.search")} />
               <CommandList>
-                <CommandEmpty>暂不支持该货币</CommandEmpty>
+                <CommandEmpty>{t("select.empty")}</CommandEmpty>
                 <CommandGroup>
                   {Currencies.map((item) => (
                     <CommandItem
@@ -65,7 +64,7 @@ export function SelectCurrency({ onSelect }: SelectProps) {
                       onSelect={(currentValue) => handleSelect(currentValue)}
                     >
                       <item.flag className="mr-2 h-4 w-4" />
-                      {item.label}
+                      {tCurrency(item.value, t)}
                       <Check
                         className={cn(
                           "ml-auto",
@@ -79,11 +78,16 @@ export function SelectCurrency({ onSelect }: SelectProps) {
             </Command>
           </PopoverContent>
         </Popover>
-      </div>  
-        <ArrowRight className="mx-2 text-lg" />
+      </div>
+      <ArrowRight className="mx-2 text-lg" />
       <div className="flex flex-col">
-        <Button variant="outline" className="w-[150px] justify-between" aria-label="目标货币" disabled>
-          人民币
+        <Button
+          variant="outline"
+          className="w-[150px] justify-between"
+          aria-label={t("select.target")}
+          disabled
+        >
+          {t("currency.CNY")}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </div>
