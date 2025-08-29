@@ -32,22 +32,22 @@ export const columns: ColumnDef<CurrencyData>[] = [
       return value === null ? <Skeleton className="h-4 w-full" /> : value;
     },
   },
-  {
-    accessorKey: "sellCash",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        购钞价
-        <ArrowUpDown className="h-4 w-4" />
-      </Button>
-    ),
-    cell: ({ cell }) => {
-      const value = cell.getValue() as number | null;
-      return value === null ? <Skeleton className="h-4 w-full" /> : value;
-    },
-  },
+  // {
+  //   accessorKey: "sellCash",
+  //   header: ({ column }) => (
+  //     <Button
+  //       variant="ghost"
+  //       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //     >
+  //       购钞价
+  //       <ArrowUpDown className="h-4 w-4" />
+  //     </Button>
+  //   ),
+  //   cell: ({ cell }) => {
+  //     const value = cell.getValue() as number | null;
+  //     return value === null ? <Skeleton className="h-4 w-full" /> : value;
+  //   },
+  // },
   {
     accessorKey: "buyRemit",
     header: ({ column }) => (
@@ -98,7 +98,7 @@ export const columns: ColumnDef<CurrencyData>[] = [
   },
   {
     accessorKey: "updated",
-    header: "获取时间",
+    header: "更新时间",
     cell: ({ cell }) => {
       const value = cell.getValue() as string | null;
       return value === null ? <Skeleton className="h-4 w-full" /> : value;
