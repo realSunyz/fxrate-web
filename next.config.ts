@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const { execSync } = require('child_process');
+const { execSync } = require("child_process");
 
 const cspHeader = `
     default-src 'self';
@@ -14,11 +14,11 @@ const cspHeader = `
     frame-src 'none';
     frame-ancestors 'none';
     connect-src 'self' https://fxrate-api.sunyz.net https://analytics.sunyz.net https://challenges.cloudflare.com;
-`
+`;
 
 module.exports = {
   env: {
-    COMMIT_ID: execSync('git rev-parse --short HEAD').toString().trim(),
+    COMMIT_ID: execSync("git rev-parse --short HEAD").toString().trim(),
   },
   async headers() {
     return [
@@ -31,19 +31,20 @@ module.exports = {
           },
           {
             key: "Permissions-Policy",
-            value: "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+            value:
+              "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
           },
           {
-            key: 'X-Frame-Options',
-            value: 'DENY'
+            key: "X-Frame-Options",
+            value: "DENY",
           },
           {
-            key: 'Referrer-Policy',
-            value: 'no-referrer-when-downgrade'
+            key: "Referrer-Policy",
+            value: "no-referrer-when-downgrade",
           },
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           // {
           //   key: 'Content-Security-Policy',
@@ -52,11 +53,12 @@ module.exports = {
         ],
       },
     ];
-  }
+  },
 };
 
 const nextConfig: NextConfig = {
   /* config options here */
+  output: "standalone",
 };
 
 export default nextConfig;
