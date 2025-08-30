@@ -32,6 +32,15 @@ export const bankMap: { [key: string]: string } = {
   visa: "visa",
 };
 
+function tzConverter(httpDate: string): string {
+  const d = new Date(httpDate);
+  if (isNaN(d.getTime())) return httpDate;
+  // UTC +08:00
+  const plus8 = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${plus8.getUTCFullYear()}-${pad(plus8.getUTCMonth() + 1)}-${pad(plus8.getUTCDate())} ${pad(plus8.getUTCHours())}:${pad(plus8.getUTCMinutes())}:${pad(plus8.getUTCSeconds())}`;
+}
+
 export const Currencies = [
   { value: "USD", flag: US },
   { value: "CAD", flag: CA },
@@ -55,6 +64,7 @@ export type CurrencyData = {
   buyCash: number | null;
   middle: number | null;
   updated: string | null;
+  hidden: boolean;
 };
 
 const useFetchRates = (fromCurrency: string, toCurrency: string) => {
@@ -72,6 +82,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
       buyCash: null,
       middle: null,
       updated: null,
+      hidden: false,
     }));
     setRates(initialRates);
 
@@ -86,6 +97,9 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
           return response.json();
         })
         .then((data) => {
+          const shouldHide =
+            data?.provided === false &&
+            data?.updated === "Thu, Jan 01 1970 00:00:00 GMT";
           setRates((prevRates) =>
             prevRates.map((item) =>
               item.bank === bankName
@@ -94,7 +108,8 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
                     buyRemit: data.remit,
                     buyCash: data.cash,
                     middle: data.middle,
-                    updated: data.updated,
+                    updated: tzConverter(data.updated),
+                    hidden: item.hidden || Boolean(shouldHide),
                   }
                 : item
             )
@@ -109,7 +124,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
                     buyRemit: 0,
                     buyCash: 0,
                     middle: 0,
-                    updated: "Unavailable",
+                    updated: "获取中",
                   }
                 : item
             )
@@ -129,6 +144,9 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
           return response.json();
         })
         .then((data) => {
+          const shouldHide =
+            data?.provided === false &&
+            data?.updated === "Thu, Jan 01 1970 00:00:00 GMT";
           setRates((prevRates) =>
             prevRates.map((item) =>
               item.bank === bankName
@@ -136,6 +154,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
                     ...item,
                     sellRemit: data.remit,
                     sellCash: data.cash,
+                    hidden: item.hidden || Boolean(shouldHide),
                   }
                 : item
             )
@@ -157,7 +176,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
     });
   }, [fromCurrency, toCurrency]);
 
-  return { rates, error, loading };
+  return { rates: rates.filter((r) => !r.hidden), error, loading };
 };
 
 export default useFetchRates;
