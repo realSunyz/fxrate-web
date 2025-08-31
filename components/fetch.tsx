@@ -29,7 +29,7 @@ export const bankMap: { [key: string]: string } = {
   citiccn: "citic.cn",
   hsbccn: "hsbc.cn",
   upi: "unionpay",
-  visa: "visa",
+//  visa: "visa",
 };
 
 function tzConverter(httpDate: string): string {
