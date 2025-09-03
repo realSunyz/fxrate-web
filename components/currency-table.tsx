@@ -10,6 +10,7 @@ import { DataTable } from "@/components/data-table";
 import { SelectCurrency } from "@/components/select-currency";
 import useFetchRates, { CurrencyData } from "@/components/fetch";
 import { useI18n, tBankName } from "@/lib/i18n";
+import TurnstileWidget from "@/components/turnstile-widget";
 
 export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<CurrencyData>[] => [
   {
@@ -111,16 +112,27 @@ export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<Cu
 export function CurrencyTable() {
   const { t } = useI18n();
   const [fromcurrency, setFromcurrency] = useState("USD");
-  const { rates, error, loading } = useFetchRates(fromcurrency, "CNY");
+  const [token, setToken] = useState<string | null>(null);
+  const { rates, error, loading } = useFetchRates(fromcurrency, "CNY", token);
 
   const handleCurrencySelect = (currency: string) => {
     setFromcurrency(currency);
   };
 
+  const columns = columnsFactory(t);
+
   return (
     <>
-      <SelectCurrency onSelect={handleCurrencySelect} />
-      <DataTable columns={columnsFactory(t)} data={rates} />
+      <SelectCurrency onSelect={handleCurrencySelect} disabled={!token} />
+      {token ? (
+        <DataTable columns={columns} data={rates} />
+      ) : (
+        <div className="overflow-x-auto rounded-md border">
+          <div className="flex items-center justify-center p-6 min-h-[180px]">
+            <TurnstileWidget onVerify={(tk) => setToken(tk)} />
+          </div>
+        </div>
+      )}
       {error && <div className="text-red-500">{error}</div>}
     </>
   );

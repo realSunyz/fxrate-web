@@ -67,12 +67,18 @@ export type CurrencyData = {
   hidden: boolean;
 };
 
-const useFetchRates = (fromCurrency: string, toCurrency: string) => {
+const useFetchRates = (fromCurrency: string, toCurrency: string, token?: string | null) => {
   const [rates, setRates] = useState<CurrencyData[]>([]);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    if (!token) {
+      setRates([]);
+      setLoading(true);
+      return;
+    }
+
     const bankNames = Object.keys(bankMap);
     const initialRates: CurrencyData[] = bankNames.map((bank) => ({
       bank,
@@ -89,7 +95,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
     let loadedCount = 0;
     bankNames.forEach((bankName) => {
       const bankCode = bankMap[bankName];
-      fetch(`${API_BASE_URL}/${bankCode}/${fromCurrency}/${toCurrency}?precision=2&amount=100&fees=0`)
+      fetch(`${API_BASE_URL}/${bankCode}/${fromCurrency}/${toCurrency}?precision=2&amount=100&fees=0&token=${encodeURIComponent(token)}`)
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP ERROR: ${response.status}`);
@@ -97,6 +103,50 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
           return response.json();
         })
         .then((data) => {
+          const invalidToken =
+            data?.success === false &&
+            typeof data?.error === "string" &&
+            data.error.toLowerCase().includes("invalid token");
+
+          if (invalidToken) {
+            setRates((prevRates) =>
+              prevRates.map((item) =>
+                item.bank === bankName
+                  ? {
+                      ...item,
+                      buyRemit: 0,
+                      buyCash: 0,
+                      sellRemit: 0,
+                      sellCash: 0,
+                      middle: 0,
+                      updated: "Token 错误",
+                      hidden: false,
+                    }
+                  : item
+              )
+            );
+            return;
+          }
+
+          if (data?.success === false) {
+            setRates((prevRates) =>
+              prevRates.map((item) =>
+                item.bank === bankName
+                  ? {
+                      ...item,
+                      buyRemit: 0,
+                      buyCash: 0,
+                      sellRemit: 0,
+                      sellCash: 0,
+                      middle: 0,
+                      updated: "无法获取数据",
+                    }
+                  : item
+              )
+            );
+            return;
+          }
+
           const shouldHide =
             data?.provided === false &&
             data?.updated === "Thu, Jan 01 1970 00:00:00 GMT";
@@ -136,7 +186,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
             setLoading(false);
           }
         });
-      fetch(`${API_BASE_URL}/${bankCode}/${toCurrency}/${fromCurrency}?reverse=true&precision=2&amount=100&fees=0`)
+      fetch(`${API_BASE_URL}/${bankCode}/${toCurrency}/${fromCurrency}?reverse=true&precision=2&amount=100&fees=0&token=${encodeURIComponent(token)}`)
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP ERROR: ${response.status}`);
@@ -144,6 +194,46 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
           return response.json();
         })
         .then((data) => {
+          const invalidToken =
+            data?.success === false &&
+            typeof data?.error === "string" &&
+            data.error.toLowerCase().includes("invalid token");
+
+          if (invalidToken) {
+            setRates((prevRates) =>
+              prevRates.map((item) =>
+                item.bank === bankName
+                  ? {
+                      ...item,
+                      buyRemit: 0,
+                      buyCash: 0,
+                      sellRemit: 0,
+                      sellCash: 0,
+                      middle: 0,
+                      updated: "Token 错误",
+                      hidden: false,
+                    }
+                  : item
+              )
+            );
+            return;
+          }
+
+          if (data?.success === false) {
+            setRates((prevRates) =>
+              prevRates.map((item) =>
+                item.bank === bankName
+                  ? {
+                      ...item,
+                      sellRemit: 0,
+                      sellCash: 0,
+                    }
+                  : item
+              )
+            );
+            return;
+          }
+
           const shouldHide =
             data?.provided === false &&
             data?.updated === "Thu, Jan 01 1970 00:00:00 GMT";
@@ -174,7 +264,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string) => {
           );
         });
     });
-  }, [fromCurrency, toCurrency]);
+  }, [fromCurrency, toCurrency, token]);
 
   return { rates: rates.filter((r) => !r.hidden), error, loading };
 };

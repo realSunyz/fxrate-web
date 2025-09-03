@@ -22,9 +22,10 @@ import { useI18n, tCurrency } from "@/lib/i18n";
 
 type SelectProps = {
   onSelect: (currency: string) => void;
+  disabled?: boolean;
 };
 
-export function SelectCurrency({ onSelect }: SelectProps) {
+export function SelectCurrency({ onSelect, disabled = false }: SelectProps) {
   const { t, locale } = useI18n();
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
@@ -46,6 +47,7 @@ export function SelectCurrency({ onSelect }: SelectProps) {
               aria-expanded={open}
               className="w-[150px] justify-between"
               aria-label={t("select.source")}
+              disabled={disabled}
             >
               {value ? tCurrency(value, t) : t("currency.USD")}
               <ChevronsUpDown className="opacity-50" />
