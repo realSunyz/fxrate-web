@@ -11,8 +11,7 @@ const cspHeader = `
     object-src 'none';
     base-uri 'self';
     form-action 'self';
-    frame-src 'none';
-    frame-ancestors 'none';
+    frame-src 'self' https://challenges.cloudflare.com;
     connect-src 'self' https://fxrate-api.sunyz.net https://analytics.sunyz.net https://challenges.cloudflare.com;
 `;
 
@@ -26,17 +25,13 @@ module.exports = {
         source: "/(.*)",
         headers: [
           {
-            key: "Access-Control-Allow-Origin",
-            value: "*",
-          },
-          {
             key: "Permissions-Policy",
             value:
               "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
           },
           {
             key: "X-Frame-Options",
-            value: "DENY",
+            value: "SAMEORIGIN",
           },
           {
             key: "Referrer-Policy",
@@ -46,10 +41,10 @@ module.exports = {
             key: "X-Content-Type-Options",
             value: "nosniff",
           },
-          // {
-          //   key: 'Content-Security-Policy',
-          //   value: cspHeader.replace(/\n/g, ''),
-          // },
+          {
+            key: 'Content-Security-Policy',
+            value: cspHeader.replace(/\n/g, ''),
+          },
         ],
       },
     ];
