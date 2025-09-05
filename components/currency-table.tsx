@@ -104,7 +104,7 @@ export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<Cu
     cell: ({ cell }) => {
       const value = cell.getValue() as string | null;
       if (value === null) return <Skeleton className="h-4 w-[150px] rounded-full" />;
-      return value === "无法获取数据" ? t("table.unavailable") : value;
+      return value;
     },
   },
 ];

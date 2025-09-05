@@ -1,4 +1,7 @@
+"use client";
+
 import { useState, useEffect } from "react";
+import { useI18n } from "@/lib/i18n";
 import {
   US,
   CA,
@@ -35,7 +38,6 @@ export const bankMap: { [key: string]: string } = {
 function tzConverter(httpDate: string): string {
   const d = new Date(httpDate);
   if (isNaN(d.getTime())) return httpDate;
-  // UTC +08:00
   const plus8 = new Date(d.getTime() + 8 * 60 * 60 * 1000);
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${plus8.getUTCFullYear()}-${pad(plus8.getUTCMonth() + 1)}-${pad(plus8.getUTCDate())} ${pad(plus8.getUTCHours())}:${pad(plus8.getUTCMinutes())}:${pad(plus8.getUTCSeconds())}`;
@@ -68,6 +70,7 @@ export type CurrencyData = {
 };
 
 const useFetchRates = (fromCurrency: string, toCurrency: string, token?: string | null) => {
+  const { t } = useI18n();
   const [rates, setRates] = useState<CurrencyData[]>([]);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -119,7 +122,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string, token?: string 
                       sellRemit: 0,
                       sellCash: 0,
                       middle: 0,
-                      updated: "Token 错误",
+                      updated: t("table.invalidToken"),
                       hidden: false,
                     }
                   : item
@@ -139,7 +142,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string, token?: string 
                       sellRemit: 0,
                       sellCash: 0,
                       middle: 0,
-                      updated: "无法获取数据",
+                      updated: t("table.unavailable"),
                     }
                   : item
               )
@@ -174,7 +177,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string, token?: string 
                     buyRemit: 0,
                     buyCash: 0,
                     middle: 0,
-                    updated: "获取中",
+                    updated: t("table.loading"),
                   }
                 : item
             )
@@ -210,7 +213,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string, token?: string 
                       sellRemit: 0,
                       sellCash: 0,
                       middle: 0,
-                      updated: "Token 错误",
+                      updated: t("table.invalidToken"),
                       hidden: false,
                     }
                   : item
