@@ -42,8 +42,8 @@ module.exports = {
             value: "nosniff",
           },
           {
-            key: 'Content-Security-Policy',
-            value: cspHeader.replace(/\n/g, ''),
+            key: "Content-Security-Policy",
+            value: cspHeader.replace(/\n/g, ""),
           },
         ],
       },
@@ -52,8 +52,12 @@ module.exports = {
 };
 
 const nextConfig: NextConfig = {
-  /* config options here */
   output: "standalone",
+  experimental: {
+    webpackMemoryOptimizations: true,
+    webpackBuildWorker: true,
+    preloadEntriesOnStart: false,
+  },
 };
 
 export default nextConfig;
