@@ -15,9 +15,29 @@ const cspHeader = `
     connect-src 'self' https://fxrate-api.sunyz.net https://analytics.sunyz.net https://challenges.cloudflare.com;
 `;
 
-module.exports = {
+const backend = process.env.BACKEND_ORIGIN || "https://fxrate-api.sunyz.net";
+
+const nextConfig: NextConfig = {
+  output: "standalone",
+  experimental: {
+    webpackMemoryOptimizations: true,
+    webpackBuildWorker: true,
+    preloadEntriesOnStart: false,
+  },
   env: {
     COMMIT_ID: execSync("git rev-parse --short HEAD").toString().trim(),
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/v1/:path*",
+        destination: `${backend}/v1/:path*`,
+      },
+      {
+        source: "/auth/:path*",
+        destination: `${backend}/auth/:path*`,
+      },
+    ];
   },
   async headers() {
     return [
@@ -48,15 +68,6 @@ module.exports = {
         ],
       },
     ];
-  },
-};
-
-const nextConfig: NextConfig = {
-  output: "standalone",
-  experimental: {
-    webpackMemoryOptimizations: true,
-    webpackBuildWorker: true,
-    preloadEntriesOnStart: false,
   },
 };
 

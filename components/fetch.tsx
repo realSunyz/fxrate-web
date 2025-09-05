@@ -16,8 +16,7 @@ import {
   AE,
   TW,
 } from "country-flag-icons/react/3x2";
-
-const API_BASE_URL = "https://fxrate-api.sunyz.net/v1";
+import { API_BASE_PATH } from "@/lib/api";
 
 export const bankMap: { [key: string]: string } = {
   cmb: "cmb",
@@ -32,7 +31,7 @@ export const bankMap: { [key: string]: string } = {
   citiccn: "citic.cn",
   hsbccn: "hsbc.cn",
   upi: "unionpay",
-//  visa: "visa",
+  //  visa: "visa",
 };
 
 function tzConverter(httpDate: string): string {
@@ -40,7 +39,11 @@ function tzConverter(httpDate: string): string {
   if (isNaN(d.getTime())) return httpDate;
   const plus8 = new Date(d.getTime() + 8 * 60 * 60 * 1000);
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${plus8.getUTCFullYear()}-${pad(plus8.getUTCMonth() + 1)}-${pad(plus8.getUTCDate())} ${pad(plus8.getUTCHours())}:${pad(plus8.getUTCMinutes())}:${pad(plus8.getUTCSeconds())}`;
+  return `${plus8.getUTCFullYear()}-${pad(plus8.getUTCMonth() + 1)}-${pad(
+    plus8.getUTCDate()
+  )} ${pad(plus8.getUTCHours())}:${pad(plus8.getUTCMinutes())}:${pad(
+    plus8.getUTCSeconds()
+  )}`;
 }
 
 export const Currencies = [
@@ -69,14 +72,23 @@ export type CurrencyData = {
   hidden: boolean;
 };
 
-const useFetchRates = (fromCurrency: string, toCurrency: string, token?: string | null) => {
+type FetchOptions = {
+  onAuthExpired?: () => void;
+};
+
+const useFetchRates = (
+  fromCurrency: string,
+  toCurrency: string,
+  authenticated?: boolean,
+  options?: FetchOptions
+) => {
   const { t } = useI18n();
   const [rates, setRates] = useState<CurrencyData[]>([]);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (!token) {
+    if (!authenticated) {
       setRates([]);
       setLoading(true);
       return;
@@ -96,41 +108,41 @@ const useFetchRates = (fromCurrency: string, toCurrency: string, token?: string 
     setRates(initialRates);
 
     let loadedCount = 0;
+    let expiredHandled = false;
+    const handleExpired = () => {
+      if (expiredHandled) return;
+      expiredHandled = true;
+      options?.onAuthExpired?.();
+    };
     bankNames.forEach((bankName) => {
       const bankCode = bankMap[bankName];
-      fetch(`${API_BASE_URL}/${bankCode}/${fromCurrency}/${toCurrency}?precision=2&amount=100&fees=0&token=${encodeURIComponent(token)}`)
-        .then((response) => {
+      fetch(
+        `${API_BASE_PATH}/${bankCode}/${fromCurrency}/${toCurrency}?precision=2&amount=100&fees=0`,
+        {
+          credentials: "include",
+        }
+      )
+        .then(async (response) => {
+          let data: any = null;
+          try {
+            data = await response.json();
+          } catch (_) {}
+          if (
+            response.status === 403 &&
+            data &&
+            typeof data.error === "string" &&
+            data.error.toLowerCase().includes("token expired")
+          ) {
+            handleExpired();
+            return;
+          }
           if (!response.ok) {
             throw new Error(`HTTP ERROR: ${response.status}`);
           }
-          return response.json();
+          return data;
         })
         .then((data) => {
-          const invalidToken =
-            data?.success === false &&
-            typeof data?.error === "string" &&
-            data.error.toLowerCase().includes("invalid token");
-
-          if (invalidToken) {
-            setRates((prevRates) =>
-              prevRates.map((item) =>
-                item.bank === bankName
-                  ? {
-                      ...item,
-                      buyRemit: 0,
-                      buyCash: 0,
-                      sellRemit: 0,
-                      sellCash: 0,
-                      middle: 0,
-                      updated: t("table.invalidToken"),
-                      hidden: false,
-                    }
-                  : item
-              )
-            );
-            return;
-          }
-
+          if (!data) return;
           if (data?.success === false) {
             setRates((prevRates) =>
               prevRates.map((item) =>
@@ -189,39 +201,33 @@ const useFetchRates = (fromCurrency: string, toCurrency: string, token?: string 
             setLoading(false);
           }
         });
-      fetch(`${API_BASE_URL}/${bankCode}/${toCurrency}/${fromCurrency}?reverse=true&precision=2&amount=100&fees=0&token=${encodeURIComponent(token)}`)
-        .then((response) => {
+      fetch(
+        `${API_BASE_PATH}/${bankCode}/${toCurrency}/${fromCurrency}?reverse=true&precision=2&amount=100&fees=0`,
+        {
+          credentials: "include",
+        }
+      )
+        .then(async (response) => {
+          let data: any = null;
+          try {
+            data = await response.json();
+          } catch (_) {}
+          if (
+            response.status === 403 &&
+            data &&
+            typeof data.error === "string" &&
+            data.error.toLowerCase().includes("token expired")
+          ) {
+            handleExpired();
+            return;
+          }
           if (!response.ok) {
             throw new Error(`HTTP ERROR: ${response.status}`);
           }
-          return response.json();
+          return data;
         })
         .then((data) => {
-          const invalidToken =
-            data?.success === false &&
-            typeof data?.error === "string" &&
-            data.error.toLowerCase().includes("invalid token");
-
-          if (invalidToken) {
-            setRates((prevRates) =>
-              prevRates.map((item) =>
-                item.bank === bankName
-                  ? {
-                      ...item,
-                      buyRemit: 0,
-                      buyCash: 0,
-                      sellRemit: 0,
-                      sellCash: 0,
-                      middle: 0,
-                      updated: t("table.invalidToken"),
-                      hidden: false,
-                    }
-                  : item
-              )
-            );
-            return;
-          }
-
+          if (!data) return;
           if (data?.success === false) {
             setRates((prevRates) =>
               prevRates.map((item) =>
@@ -267,7 +273,7 @@ const useFetchRates = (fromCurrency: string, toCurrency: string, token?: string 
           );
         });
     });
-  }, [fromCurrency, toCurrency, token]);
+  }, [fromCurrency, toCurrency, authenticated]);
 
   return { rates: rates.filter((r) => !r.hidden), error, loading };
 };

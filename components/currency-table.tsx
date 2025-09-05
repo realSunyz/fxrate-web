@@ -11,6 +11,7 @@ import { SelectCurrency } from "@/components/select-currency";
 import useFetchRates, { CurrencyData } from "@/components/fetch";
 import { useI18n, tBankName } from "@/lib/i18n";
 import TurnstileWidget from "@/components/turnstile-widget";
+import { AUTH_SIGNED_PATH } from "@/lib/api";
 
 export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<CurrencyData>[] => [
   {
@@ -112,8 +113,14 @@ export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<Cu
 export function CurrencyTable() {
   const { t } = useI18n();
   const [fromcurrency, setFromcurrency] = useState("USD");
-  const [token, setToken] = useState<string | null>(null);
-  const { rates, error, loading } = useFetchRates(fromcurrency, "CNY", token);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const { rates, error, loading } = useFetchRates(fromcurrency, "CNY", authenticated, {
+    onAuthExpired: () => {
+      setAuthenticated(false);
+      setAuthError("token expired");
+    },
+  });
 
   const handleCurrencySelect = (currency: string) => {
     setFromcurrency(currency);
@@ -121,15 +128,58 @@ export function CurrencyTable() {
 
   const columns = columnsFactory(t);
 
+  const onVerifyTurnstile = async (tk: string) => {
+    setAuthError(null);
+    try {
+      const resp = await fetch(`${AUTH_SIGNED_PATH}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: tk }),
+        credentials: "include",
+      });
+      if (!resp.ok) {
+        let detail = "";
+        try {
+          const data = await resp.json();
+          detail = typeof data?.error === "string" ? data.error : "";
+        } catch (_) {}
+        if (resp.status === 400) {
+          setAuthError(detail || "missing_token");
+        } else if (resp.status === 403) {
+          setAuthError(detail || "turnstile_verification_failed");
+        } else if (resp.status === 500) {
+          setAuthError(detail || "server_misconfigured");
+        } else {
+          setAuthError(detail || `auth_failed_${resp.status}`);
+        }
+        setAuthenticated(false);
+        return;
+      }
+      setAuthenticated(true);
+    } catch (e) {
+      setAuthError("network_error");
+      setAuthenticated(false);
+    }
+  };
+
   return (
     <>
-      <SelectCurrency onSelect={handleCurrencySelect} disabled={!token} />
-      {token ? (
+      <SelectCurrency onSelect={handleCurrencySelect} disabled={!authenticated} />
+      {authenticated ? (
         <DataTable columns={columns} data={rates} />
       ) : (
         <div className="overflow-x-auto rounded-md border">
           <div className="flex items-center justify-center p-6 min-h-[180px]">
-            <TurnstileWidget onVerify={(tk) => setToken(tk)} />
+            <div className="flex flex-col items-center gap-2">
+              <TurnstileWidget onVerify={onVerifyTurnstile} />
+              {authError && (
+                <div className="text-red-500 text-xs">
+                  {authError}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
