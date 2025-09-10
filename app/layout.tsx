@@ -67,7 +67,7 @@ export default function RootLayout({
         <Script src="https://cdn.sunyz.net/assets/fxrate/themeScript.js" />
         <Script
           src="https://analytics.sunyz.net/script.js"
-          data-website-id="01c3d598-8834-44f4-a3f4-d85a4330ccdb"
+          data-website-id="1931c3e7-60cd-4d04-92d1-e16ee61f5588"
         />
         <script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js"
