@@ -146,13 +146,13 @@ export function CurrencyTable() {
           detail = typeof data?.error === "string" ? data.error : "";
         } catch (_) {}
         if (resp.status === 400) {
-          setAuthError(detail || "missing_token");
+          setAuthError(detail || "Missing Token (ERR-C400)");
         } else if (resp.status === 403) {
-          setAuthError(detail || "turnstile_verification_failed");
+          setAuthError(detail || "Turnstile Verification Failed (ERR-C403)");
         } else if (resp.status === 500) {
-          setAuthError(detail || "server_misconfigured");
+          setAuthError(detail || "Server Misconfigured (ERR-C500)");
         } else {
-          setAuthError(detail || `auth_failed_${resp.status}`);
+          setAuthError(detail || `Auth Failed (ERR-C${resp.status})`);
         }
         setAuthenticated(false);
         return;
@@ -179,6 +179,18 @@ export function CurrencyTable() {
                   {authError}
                 </div>
               )}
+              <p className="text-xs text-muted-foreground text-center">
+                {t("consent.agreePrefix")}
+                {" "}
+                <a
+                  href="https://sunyz.net/docs/zh-cn/fxrate/tos"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  {t("consent.policy")}
+                </a>
+              </p>
             </div>
           </div>
         </div>

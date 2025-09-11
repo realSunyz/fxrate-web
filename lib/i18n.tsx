@@ -52,6 +52,9 @@ const dictionaries: Dictionaries = {
     "select.target": "目标货币",
     "select.search": "搜索",
     "select.empty": "暂不支持该货币",
+    // Consent
+    "consent.agreePrefix": "使用本服务即视为同意我们的",
+    "consent.policy": "服务政策",
     // Currency
     "currency.USD": "美元",
     "currency.CAD": "加元",
@@ -121,6 +124,9 @@ const dictionaries: Dictionaries = {
     "select.target": "Target",
     "select.search": "Search",
     "select.empty": "Currency Not Supported Yet",
+    // Consent
+    "consent.agreePrefix": "By using this service, you agree to our",
+    "consent.policy": "Terms of Service",
     // Currency
     "currency.USD": "USD",
     "currency.CAD": "CAD",
