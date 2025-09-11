@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 
 declare global {
   interface Window {
@@ -14,6 +15,7 @@ declare global {
           "expired-callback"?: () => void;
           theme?: "auto" | "light" | "dark";
           appearance?: "always" | "execute" | "interaction-only";
+          language?: string;
         }
       ) => string | undefined;
       reset?: (id?: string) => void;
@@ -25,17 +27,22 @@ type TurnstileWidgetProps = {
   onVerify: (token: string) => void;
   siteKey?: string;
   theme?: "auto" | "light" | "dark";
+  language?: string;
 };
 
 export function TurnstileWidget({
   onVerify,
   siteKey,
   theme = "auto",
+  language,
 }: TurnstileWidgetProps) {
+  const { locale } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const [widgetId, setWidgetId] = useState<string | undefined>(undefined);
+  const idRef = useRef<string | undefined>(undefined);
   const resolvedSiteKey =
     siteKey || process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+  const resolvedLanguage = language || (locale === "zh" ? "zh-CN" : "en");
 
   useEffect(() => {
     let cancelled = false;
@@ -45,9 +52,13 @@ export function TurnstileWidget({
       if (!window.turnstile || !resolvedSiteKey) {
         return;
       }
+      try {
+        containerRef.current.innerHTML = "";
+      } catch (_) {}
       const id = window.turnstile.render(containerRef.current, {
         sitekey: resolvedSiteKey,
         theme,
+        language: resolvedLanguage,
         callback: (token: string) => {
           if (!cancelled) onVerify(token);
         },
@@ -56,7 +67,9 @@ export function TurnstileWidget({
           window.turnstile?.reset?.(id);
         },
       });
-      setWidgetId(typeof id === "string" ? id : undefined);
+      const realId = typeof id === "string" ? id : undefined;
+      idRef.current = realId;
+      setWidgetId(realId);
     };
 
     const start = Date.now();
@@ -71,18 +84,25 @@ export function TurnstileWidget({
 
     return () => {
       cancelled = true;
-      if (widgetId && window.turnstile?.reset) {
-        try {
-          window.turnstile.reset(widgetId);
-        } catch (_) {}
-      }
+      try {
+        if (window.turnstile?.reset) {
+          if (idRef.current) {
+            window.turnstile.reset(idRef.current);
+          } else {
+            window.turnstile.reset();
+          }
+        }
+      } catch (_) {}
+      try {
+        if (containerRef.current) containerRef.current.innerHTML = "";
+      } catch (_) {}
     };
-  }, [resolvedSiteKey, theme]);
+  }, [resolvedSiteKey, theme, resolvedLanguage]);
 
   if (!resolvedSiteKey) {
     return (
-      <div className="text-center text-sm text-muted-foreground">
-        Invalid Turnstile Site Key
+      <div className="text-red-500 text-center text-sm text-muted-foreground">
+        Invalid Turnstile Site Key (ERR-C999)
       </div>
     );
   }

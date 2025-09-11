@@ -15,7 +15,7 @@ const cspHeader = `
     connect-src 'self' https://fxrate-api.sunyz.net https://analytics.sunyz.net https://challenges.cloudflare.com;
 `;
 
-const backend = process.env.BACKEND_ORIGIN || "https://fxrate-api.sunyz.net";
+const fxRate_API = process.env.fxRate_API || "https://fxrate-api.sunyz.net";
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -31,11 +31,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/v1/:path*",
-        destination: `${backend}/v1/:path*`,
+        destination: `${fxRate_API}/v1/:path*`,
       },
       {
         source: "/auth/:path*",
-        destination: `${backend}/auth/:path*`,
+        destination: `${fxRate_API}/auth/:path*`,
       },
     ];
   },

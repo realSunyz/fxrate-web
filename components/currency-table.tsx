@@ -118,7 +118,7 @@ export function CurrencyTable() {
   const { rates, error, loading } = useFetchRates(fromcurrency, "CNY", authenticated, {
     onAuthExpired: () => {
       setAuthenticated(false);
-      setAuthError("token expired");
+      setAuthError("Token Expired (ERR-C102)");
     },
   });
 
@@ -159,7 +159,7 @@ export function CurrencyTable() {
       }
       setAuthenticated(true);
     } catch (e) {
-      setAuthError("network_error");
+      setAuthError("Network Error (ERR-C101)");
       setAuthenticated(false);
     }
   };
