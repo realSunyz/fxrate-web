@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { DataTable } from "@/components/data-table";
 import { SelectCurrency } from "@/components/select-currency";
-import useFetchRates, { CurrencyData } from "@/components/fetch";
+import useFetchRates, { CurrencyData, Currencies } from "@/components/fetch";
 import { useI18n, tBankName } from "@/lib/i18n";
 import TurnstileWidget from "@/components/turnstile-widget";
 import { AUTH_SIGNED_PATH } from "@/lib/api";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<CurrencyData>[] => [
   {
@@ -113,6 +114,11 @@ export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<Cu
 export function CurrencyTable() {
   const { t } = useI18n();
   const [fromcurrency, setFromcurrency] = useState("USD");
+  const tocurrency = "CNY";
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const validCodes = useMemo(() => new Set(Currencies.map((c) => c.value)), []);
   const [authenticated, setAuthenticated] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const { rates, error, loading, refresh } = useFetchRates(fromcurrency, "CNY", authenticated, {
@@ -124,7 +130,20 @@ export function CurrencyTable() {
 
   const handleCurrencySelect = (currency: string) => {
     setFromcurrency(currency);
+    try {
+      const params = new URLSearchParams(searchParams?.toString());
+      params.set("from", currency);
+      params.set("to", tocurrency);
+      router.replace(`${pathname}?${params.toString()}`);
+    } catch (_) {}
   };
+
+  useEffect(() => {
+    const from = searchParams?.get("from");
+    if (from && validCodes.has(from) && from !== fromcurrency) {
+      setFromcurrency(from);
+    }
+  }, [searchParams, validCodes]);
 
   const columns = columnsFactory(t);
 
@@ -169,7 +188,12 @@ export function CurrencyTable() {
 
   return (
     <>
-      <SelectCurrency onSelect={handleCurrencySelect} disabled={!authenticated} onRefresh={refresh} />
+      <SelectCurrency
+        value={fromcurrency}
+        onSelect={handleCurrencySelect}
+        disabled={!authenticated}
+        onRefresh={refresh}
+      />
       {authenticated ? (
         <DataTable columns={columns} data={rates} />
       ) : (

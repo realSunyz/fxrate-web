@@ -24,12 +24,17 @@ type SelectProps = {
   onSelect: (currency: string) => void;
   disabled?: boolean;
   onRefresh?: () => void;
+  value?: string;
 };
 
-export function SelectCurrency({ onSelect, disabled = false, onRefresh }: SelectProps) {
+export function SelectCurrency({ onSelect, disabled = false, onRefresh, value: controlledValue }: SelectProps) {
   const { t, locale } = useI18n();
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = React.useState(controlledValue || "");
+
+  React.useEffect(() => {
+    setValue(controlledValue || "");
+  }, [controlledValue]);
 
   const handleSelect = (currency: string) => {
     setValue(currency);
