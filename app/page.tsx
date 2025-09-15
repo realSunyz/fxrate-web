@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { SettingsDialog } from "@/components/settings-dialog";
 import { CurrencyTable } from "@/components/currency-table";
 
@@ -6,7 +7,9 @@ export default function Home() {
     <>
       <div className="flex w-full px-4">
         <div className="container mx-auto">
-          <CurrencyTable />
+          <Suspense fallback={<div className="text-sm text-muted-foreground">Loading...</div>}>
+            <CurrencyTable />
+          </Suspense>
         </div>
       </div>
       <div className="fixed bottom-4 right-4 z-50 flex gap-2">
