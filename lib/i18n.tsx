@@ -27,6 +27,10 @@ const dictionaries: Dictionaries = {
     "help.info.line1": "“兴业寰宇”指由兴业银行发行的“寰宇人生卡”，持卡人可享受结汇购汇交易费率5折优惠。",
     "help.info.line2": "“银联国际”与“维萨VISA”均为卡组织汇率，仅适用于使用该卡组织所发行银行卡进行的外币交易，不可手动购汇购钞。",
     "help.info.line3": "由于各银行方可能不定期调整数据接口，如您发现某数据源连续多日出现异常，请发送邮件至 noc@sunyz.net 反馈，我们将及时核查与处理。",
+    "help.info.line4": "点击货币选择栏右侧的刷新按钮可强制更新各银行汇率。为保证服务稳定，请勿频繁点击。",
+    "help.info.line5.prefix": "使用本服务即表示你已阅读并同意我们的",
+    "help.info.line5.link": "服务条款",
+    "help.info.line5.suffix": "。",
     // Footer
     "footer.build": "fxRate Web (v{{version}}-{{id}})",
     "footer.copyright": "版权所有 © 2025 Yanzheng Sun。保留所有权利。",
@@ -91,6 +95,10 @@ const dictionaries: Dictionaries = {
     "help.info.line1": "\"CIB HY\" refers to \"Huanyu Life Card\" issued by China Industrial Bank. Cardholders are entitled to a 50% discount on conversion fees for foreign exchange purchases and settlements.",
     "help.info.line2": "\"UnionPay\" and \"VISA\" refers to exchange rates published by the respective card associations. These rates apply only to foreign currency transactions conducted with cards issued by the corresponding card association.",
     "help.info.line3": "As banks may adjust their data interfaces from time to time, if you notice that a data source has been abnormal for serval days, please report it via email to noc@sunyz.net. We will verify and handle it promptly.",
+    "help.info.line4": "Click the refresh button next to the currency selector to force-update rates. To keep the service stable, please avoid frequent clicks.",
+    "help.info.line5.prefix": "By using this service, you agree to our ",
+    "help.info.line5.link": "Terms of Service",
+    "help.info.line5.suffix": ".",
     // Footer
     "footer.build": "fxRate Web (v{{version}}-{{id}})",
     "footer.copyright": "Copyright © 2025 Yanzheng Sun. All rights reserved.",

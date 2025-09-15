@@ -43,6 +43,18 @@ export function SettingsDialog() {
               <li>{t("help.info.line1")}</li>
               <li>{t("help.info.line2")}</li>
               <li>{t("help.info.line3")}</li>
+              <li>{t("help.info.line4")}</li>
+              <li>
+                {t("help.info.line5.prefix")}
+                <a
+                  href="https://sunyz.net/docs/zh-cn/fxrate/tos"
+                  className="underline"
+                  target="_blank"
+                >
+                  {t("help.info.line5.link")}
+                </a>
+                {t("help.info.line5.suffix")}
+              </li>
             </ul>
           </div>
           <div>
