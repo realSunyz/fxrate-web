@@ -38,15 +38,15 @@ export function SelectCurrency({ onSelect, disabled = false, onRefresh }: Select
   };
 
   return (
-    <div className="flex flex-wrap items-center mb-4 mt-4">
-      <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 mb-4 mt-4 flex-nowrap overflow-x-auto">
+      <div className="flex items-center gap-1 sm:gap-2">
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               role="combobox"
               aria-expanded={open}
-              className="w-[150px] justify-between"
+              className="w-[120px] sm:w-[150px] justify-between"
               aria-label={t("select.source")}
               disabled={disabled}
             >
@@ -82,11 +82,11 @@ export function SelectCurrency({ onSelect, disabled = false, onRefresh }: Select
           </PopoverContent>
         </Popover>
       </div>
-      <ArrowRight className="mx-2 text-lg" />
-      <div className="flex items-center gap-2">
+      <ArrowRight className="mx-1 sm:mx-2 h-4 w-4" />
+      <div className="flex items-center gap-1 sm:gap-2">
         <Button
           variant="outline"
-          className="w-[150px] justify-between"
+          className="w-[120px] sm:w-[150px] justify-between"
           aria-label={t("select.target")}
           disabled
         >

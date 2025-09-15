@@ -114,6 +114,15 @@ const useFetchRates = (
       expiredHandled = true;
       options?.onAuthExpired?.();
     };
+    const handleInvalidThenReload = () => {
+      if (expiredHandled) return;
+      expiredHandled = true;
+      if (typeof window !== "undefined") {
+        window.location.reload();
+      }
+    };
+    const includesInvalidToken = (msg: unknown) =>
+      typeof msg === "string" && msg.toLowerCase().includes("token invalid");
     const refreshQuery = withRefresh ? "&refresh=true" : "";
     bankNames.forEach((bankName) => {
       const bankCode = bankMap[bankName];
@@ -128,14 +137,19 @@ const useFetchRates = (
           try {
             data = await response.json();
           } catch (_) {}
-          if (
-            response.status === 403 &&
-            data &&
-            typeof data.error === "string" &&
-            data.error.toLowerCase().includes("token expired")
-          ) {
-            handleExpired();
-            return;
+          if (data) {
+            if ((response.status === 401 || response.status === 403) && includesInvalidToken(data.error)) {
+              handleInvalidThenReload();
+              return;
+            }
+            if (
+              response.status === 403 &&
+              typeof data.error === "string" &&
+              data.error.toLowerCase().includes("token expired")
+            ) {
+              handleExpired();
+              return;
+            }
           }
           if (!response.ok) {
             throw new Error(`HTTP ERROR: ${response.status}`);
@@ -213,14 +227,19 @@ const useFetchRates = (
           try {
             data = await response.json();
           } catch (_) {}
-          if (
-            response.status === 403 &&
-            data &&
-            typeof data.error === "string" &&
-            data.error.toLowerCase().includes("token expired")
-          ) {
-            handleExpired();
-            return;
+          if (data) {
+            if ((response.status === 401 || response.status === 403) && includesInvalidToken(data.error)) {
+              handleInvalidThenReload();
+              return;
+            }
+            if (
+              response.status === 403 &&
+              typeof data.error === "string" &&
+              data.error.toLowerCase().includes("token expired")
+            ) {
+              handleExpired();
+              return;
+            }
           }
           if (!response.ok) {
             throw new Error(`HTTP ERROR: ${response.status}`);
