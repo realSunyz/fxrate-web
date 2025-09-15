@@ -86,8 +86,7 @@ const useFetchRates = (
   const [rates, setRates] = useState<CurrencyData[]>([]);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
+  const fetchAll = (withRefresh: boolean) => {
     if (!authenticated) {
       setRates([]);
       setLoading(true);
@@ -107,6 +106,7 @@ const useFetchRates = (
     }));
     setRates(initialRates);
 
+    setLoading(true);
     let loadedCount = 0;
     let expiredHandled = false;
     const handleExpired = () => {
@@ -114,10 +114,11 @@ const useFetchRates = (
       expiredHandled = true;
       options?.onAuthExpired?.();
     };
+    const refreshQuery = withRefresh ? "&refresh=true" : "";
     bankNames.forEach((bankName) => {
       const bankCode = bankMap[bankName];
       fetch(
-        `${API_BASE_PATH}/${bankCode}/${fromCurrency}/${toCurrency}?precision=2&amount=100&fees=0`,
+        `${API_BASE_PATH}/${bankCode}/${fromCurrency}/${toCurrency}?precision=2&amount=100&fees=0${refreshQuery}`,
         {
           credentials: "include",
         }
@@ -202,7 +203,7 @@ const useFetchRates = (
           }
         });
       fetch(
-        `${API_BASE_PATH}/${bankCode}/${toCurrency}/${fromCurrency}?reverse=true&precision=2&amount=100&fees=0`,
+        `${API_BASE_PATH}/${bankCode}/${toCurrency}/${fromCurrency}?reverse=true&precision=2&amount=100&fees=0${refreshQuery}`,
         {
           credentials: "include",
         }
@@ -273,9 +274,15 @@ const useFetchRates = (
           );
         });
     });
+  };
+
+  useEffect(() => {
+    fetchAll(false);
   }, [fromCurrency, toCurrency, authenticated]);
 
-  return { rates: rates.filter((r) => !r.hidden), error, loading };
+  const refresh = () => fetchAll(true);
+
+  return { rates: rates.filter((r) => !r.hidden), error, loading, refresh };
 };
 
 export default useFetchRates;

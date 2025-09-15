@@ -42,7 +42,7 @@ export function TurnstileWidget({
   const idRef = useRef<string | undefined>(undefined);
   const resolvedSiteKey =
     siteKey || process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
-  const resolvedLanguage = language || (locale === "zh" ? "zh-CN" : "en");
+  const resolvedLanguage = language || (locale === "zh" ? "zh-cn" : "en");
 
   useEffect(() => {
     let cancelled = false;

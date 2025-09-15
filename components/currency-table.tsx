@@ -115,10 +115,10 @@ export function CurrencyTable() {
   const [fromcurrency, setFromcurrency] = useState("USD");
   const [authenticated, setAuthenticated] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const { rates, error, loading } = useFetchRates(fromcurrency, "CNY", authenticated, {
+  const { rates, error, loading, refresh } = useFetchRates(fromcurrency, "CNY", authenticated, {
     onAuthExpired: () => {
       setAuthenticated(false);
-      setAuthError("Token Expired (ERR-C102)");
+      setAuthError("Token Expired (ERR-T101)");
     },
   });
 
@@ -145,28 +145,31 @@ export function CurrencyTable() {
           const data = await resp.json();
           detail = typeof data?.error === "string" ? data.error : "";
         } catch (_) {}
-        if (resp.status === 400) {
-          setAuthError(detail || "Missing Token (ERR-C400)");
+        const normalized = detail.toLowerCase();
+        if (resp.status === 401 || normalized.includes("token invalid")) {
+          setAuthError("Invalid Token (ERR-T100)");
+        } else if (resp.status === 400) {
+          setAuthError(detail || "Missing Token (ERR-T102)");
         } else if (resp.status === 403) {
-          setAuthError(detail || "Turnstile Verification Failed (ERR-C403)");
+          setAuthError(detail || "Turnstile Verification Failed (ERR-T103)");
         } else if (resp.status === 500) {
-          setAuthError(detail || "Server Misconfigured (ERR-C500)");
+          setAuthError(detail || "Server Misconfigured (ERR-T104)");
         } else {
-          setAuthError(detail || `Auth Failed (ERR-C${resp.status})`);
+          setAuthError(detail || `Auth Failed (ERR-T-RESP${resp.status})`);
         }
         setAuthenticated(false);
         return;
       }
       setAuthenticated(true);
     } catch (e) {
-      setAuthError("Network Error (ERR-C101)");
+      setAuthError("Network Error (ERR-N100)");
       setAuthenticated(false);
     }
   };
 
   return (
     <>
-      <SelectCurrency onSelect={handleCurrencySelect} disabled={!authenticated} />
+      <SelectCurrency onSelect={handleCurrencySelect} disabled={!authenticated} onRefresh={refresh} />
       {authenticated ? (
         <DataTable columns={columns} data={rates} />
       ) : (

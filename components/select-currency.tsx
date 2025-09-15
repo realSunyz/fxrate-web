@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown, ArrowRight } from "lucide-react";
+import { Check, ChevronsUpDown, ArrowRight, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Currencies } from "@/components/fetch";
@@ -23,9 +23,10 @@ import { useI18n, tCurrency } from "@/lib/i18n";
 type SelectProps = {
   onSelect: (currency: string) => void;
   disabled?: boolean;
+  onRefresh?: () => void;
 };
 
-export function SelectCurrency({ onSelect, disabled = false }: SelectProps) {
+export function SelectCurrency({ onSelect, disabled = false, onRefresh }: SelectProps) {
   const { t, locale } = useI18n();
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
@@ -38,7 +39,7 @@ export function SelectCurrency({ onSelect, disabled = false }: SelectProps) {
 
   return (
     <div className="flex flex-wrap items-center mb-4 mt-4">
-      <div className="flex flex-col">
+      <div className="flex items-center gap-2">
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -82,7 +83,7 @@ export function SelectCurrency({ onSelect, disabled = false }: SelectProps) {
         </Popover>
       </div>
       <ArrowRight className="mx-2 text-lg" />
-      <div className="flex flex-col">
+      <div className="flex items-center gap-2">
         <Button
           variant="outline"
           className="w-[150px] justify-between"
@@ -91,6 +92,15 @@ export function SelectCurrency({ onSelect, disabled = false }: SelectProps) {
         >
           {t("currency.CNY")}
           <ChevronsUpDown className="opacity-50" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Refresh rates"
+          onClick={() => onRefresh?.()}
+          disabled={disabled}
+        >
+          <RefreshCw />
         </Button>
       </div>
     </div>
