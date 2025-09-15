@@ -1,6 +1,17 @@
 import type { NextConfig } from "next";
 
 const { execSync } = require("child_process");
+const pkg = require("./package.json");
+
+function resolveCommitId(): string {
+  try {
+    const fromEnv = process.env.GIT_HASH || process.env.VERCEL_GIT_COMMIT_SHA || process.env.COMMIT_ID;
+    if (fromEnv && fromEnv.trim()) return fromEnv.trim().slice(0, 12);
+    return execSync("git rev-parse --short HEAD").toString().trim();
+  } catch (e) {
+    return "dev";
+  }
+}
 
 const cspHeader = `
     default-src 'self';
@@ -17,6 +28,8 @@ const cspHeader = `
 
 const fxRate_API = process.env.fxRate_API || "https://fxrate-api.sunyz.net";
 
+const commitId = resolveCommitId();
+
 const nextConfig: NextConfig = {
   output: "standalone",
   experimental: {
@@ -24,8 +37,13 @@ const nextConfig: NextConfig = {
     webpackBuildWorker: true,
     preloadEntriesOnStart: false,
   },
+  generateBuildId: async () => {
+    // Use Git commit as build ID for traceability across environments
+    return commitId;
+  },
   env: {
-    COMMIT_ID: execSync("git rev-parse --short HEAD").toString().trim(),
+    COMMIT_ID: commitId,
+    APP_VERSION: pkg.version,
   },
   async rewrites() {
     return [
