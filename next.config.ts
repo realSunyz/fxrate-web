@@ -26,8 +26,6 @@ const cspHeader = `
     connect-src 'self' https://fxrate-api.sunyz.net https://analytics.sunyz.net https://challenges.cloudflare.com;
 `;
 
-const fxRate_API = process.env.fxRate_API || "https://fxrate-api.sunyz.net";
-
 const commitId = resolveCommitId();
 
 const nextConfig: NextConfig = {
@@ -38,7 +36,6 @@ const nextConfig: NextConfig = {
     preloadEntriesOnStart: false,
   },
   generateBuildId: async () => {
-    // Use Git commit as build ID for traceability across environments
     return commitId;
   },
   env: {
@@ -49,11 +46,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/v1/:path*",
-        destination: `${fxRate_API}/v1/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_FXRATE_API}/v1/:path*`,
       },
       {
         source: "/auth/:path*",
-        destination: `${fxRate_API}/auth/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_FXRATE_API}/auth/:path*`,
       },
     ];
   },
