@@ -5,8 +5,11 @@ const pkg = require("./package.json");
 
 function resolveCommitId(): string {
   try {
-    const fromEnv = process.env.GIT_HASH || process.env.VERCEL_GIT_COMMIT_SHA || process.env.COMMIT_ID;
-    if (fromEnv && fromEnv.trim()) return fromEnv.trim().slice(0, 12);
+    const fromEnv =
+      process.env.GIT_HASH ||
+      process.env.VERCEL_GIT_COMMIT_SHA ||
+      process.env.COMMIT_ID;
+    if (fromEnv && fromEnv.trim()) return fromEnv.trim().slice(0, 7);
     return execSync("git rev-parse --short HEAD").toString().trim();
   } catch (e) {
     return "dev";
