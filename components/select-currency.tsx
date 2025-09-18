@@ -30,37 +30,13 @@ type SelectProps = {
 
 type RefreshState = "idle" | "loading" | "success";
 
-const SuccessCheckIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20 6 9 17l-5-5" />
-  </svg>
-);
-
-export function SelectCurrency({
-  onSelect,
-  disabled = false,
-  onRefresh,
-  value: controlledValue,
-  refreshing = false,
-}: SelectProps) {
+export function SelectCurrency({ onSelect, disabled = false, onRefresh, value: controlledValue, refreshing = false }: SelectProps) {
   const { t, locale } = useI18n();
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(controlledValue || "");
   const [refreshState, setRefreshState] = React.useState<RefreshState>("idle");
   const prevRefreshingRef = React.useRef(refreshing);
-  const resetTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  );
+  const resetTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   React.useEffect(() => {
     setValue(controlledValue || "");
@@ -138,7 +114,6 @@ export function SelectCurrency({
                     <CommandItem
                       key={item.value}
                       value={item.value}
-                      keywords={[item.value, item.value.toLowerCase(), ...item.keywords]}
                       onSelect={(currentValue) => handleSelect(currentValue)}
                     >
                       <item.flag className="mr-2 h-4 w-4" />
@@ -203,7 +178,7 @@ export function SelectCurrency({
                 : "opacity-0 scale-90"
             )}
           >
-            <SuccessCheckIcon />
+            <Check />
           </span>
           <span className="opacity-0">
             <RefreshCw className="h-4 w-4" />
