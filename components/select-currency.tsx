@@ -30,13 +30,37 @@ type SelectProps = {
 
 type RefreshState = "idle" | "loading" | "success";
 
-export function SelectCurrency({ onSelect, disabled = false, onRefresh, value: controlledValue, refreshing = false }: SelectProps) {
+const SuccessCheckIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 6 9 17l-5-5" />
+  </svg>
+);
+
+export function SelectCurrency({
+  onSelect,
+  disabled = false,
+  onRefresh,
+  value: controlledValue,
+  refreshing = false,
+}: SelectProps) {
   const { t, locale } = useI18n();
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(controlledValue || "");
   const [refreshState, setRefreshState] = React.useState<RefreshState>("idle");
   const prevRefreshingRef = React.useRef(refreshing);
-  const resetTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resetTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   React.useEffect(() => {
     setValue(controlledValue || "");
@@ -85,16 +109,6 @@ export function SelectCurrency({ onSelect, disabled = false, onRefresh, value: c
     if (disabled) return;
     setRefreshState("loading");
     onRefresh?.();
-  };
-
-  const renderRefreshIcon = () => {
-    if (refreshState === "loading") {
-      return <RefreshCw className="h-4 w-4 animate-spin" />;
-    }
-    if (refreshState === "success") {
-      return <Check className="h-4 w-4 text-emerald-500 transition-transform" />;
-    }
-    return <RefreshCw className="h-4 w-4" />;
   };
 
   return (
@@ -160,8 +174,39 @@ export function SelectCurrency({ onSelect, disabled = false, onRefresh, value: c
           onClick={handleRefreshClick}
           disabled={disabled}
           data-state={refreshState}
+          className={cn(
+            "relative overflow-hidden transition-colors duration-300 ease-out",
+            refreshState === "success" ? "text-emerald-500" : undefined
+          )}
         >
-          {renderRefreshIcon()}
+          <span
+            className={cn(
+              "absolute inset-0 flex items-center justify-center transition-all duration-300 ease-out",
+              refreshState === "success"
+                ? "opacity-0 scale-80"
+                : "opacity-100 scale-100"
+            )}
+          >
+            <RefreshCw
+              className={cn(
+                "h-4 w-4",
+                refreshState === "loading" && "animate-spin"
+              )}
+            />
+          </span>
+          <span
+            className={cn(
+              "absolute inset-0 flex items-center justify-center transition-all duration-300 ease-out",
+              refreshState === "success"
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-90"
+            )}
+          >
+            <SuccessCheckIcon />
+          </span>
+          <span className="opacity-0">
+            <RefreshCw className="h-4 w-4" />
+          </span>
         </Button>
       </div>
     </div>
