@@ -193,6 +193,7 @@ export function CurrencyTable() {
         onSelect={handleCurrencySelect}
         disabled={!authenticated}
         onRefresh={refresh}
+        refreshing={authenticated && loading}
       />
       {authenticated ? (
         <DataTable columns={columns} data={rates} />
