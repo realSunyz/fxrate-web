@@ -15,11 +15,8 @@ const dictionaries: Dictionaries = {
   zh: {
     // General
     "navbar.title": "fxRate Web",
-    "common.toggleTheme": "切换主题",
-    "common.language": "语言",
-    "common.zh": "中文",
-    "common.en": "English",
-    "common.followSystem": "跟随系统",
+    "settings.preferences": "偏好",
+    "settings.switchLanguage": "English",
     // Help Dialog
     "help.title": "帮助",
     "help.description": "你可能需要的信息和设置",
@@ -83,11 +80,8 @@ const dictionaries: Dictionaries = {
   en: {
     // General
     "navbar.title": "fxRate Web",
-    "common.toggleTheme": "Toggle theme",
-    "common.language": "Language",
-    "common.zh": "中文",
-    "common.en": "English",
-    "common.followSystem": "Follow system",
+    "settings.preferences": "Preferences",
+    "settings.switchLanguage": "中文 (简体)",
     // Help Dialog
     "help.title": "Help",
     "help.description": "Information and Settings you may need",
