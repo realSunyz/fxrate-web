@@ -46,19 +46,25 @@ function tzConverter(httpDate: string): string {
   )}`;
 }
 
-export const Currencies = [
-  { value: "USD", flag: US },
-  { value: "CAD", flag: CA },
-  { value: "HKD", flag: HK },
-  { value: "EUR", flag: EU },
-  { value: "GBP", flag: GB },
-  { value: "JPY", flag: JP },
-  { value: "KRW", flag: KR },
-  { value: "SGD", flag: SG },
-  { value: "RUB", flag: RU },
-  { value: "CHF", flag: CH },
-  { value: "TWD", flag: TW },
-  { value: "AED", flag: AE },
+export type CurrencyOption = {
+  value: string;
+  flag: typeof US;
+  keywords: string[];
+};
+
+export const Currencies: CurrencyOption[] = [
+  { value: "USD", flag: US, keywords: ["usd", "美元", "美金", "dollar", "usa"] },
+  { value: "CAD", flag: CA, keywords: ["cad", "加元", "加拿大", "canadian"] },
+  { value: "HKD", flag: HK, keywords: ["hkd", "港元", "港币", "香港"] },
+  { value: "EUR", flag: EU, keywords: ["eur", "欧元", "歐元", "euro", "欧盟"] },
+  { value: "GBP", flag: GB, keywords: ["gbp", "英镑", "英鎊", "pound", "英国"] },
+  { value: "JPY", flag: JP, keywords: ["jpy", "日元", "日圓", "yen", "日本"] },
+  { value: "KRW", flag: KR, keywords: ["krw", "韩元", "韓元", "won", "韩国"] },
+  { value: "SGD", flag: SG, keywords: ["sgd", "新元", "新加坡元", "singapore"] },
+  { value: "RUB", flag: RU, keywords: ["rub", "卢布", "盧布", "ruble", "俄罗斯"] },
+  { value: "CHF", flag: CH, keywords: ["chf", "瑞郎", "法郎", "swiss"] },
+  { value: "TWD", flag: TW, keywords: ["twd", "新台币", "新臺幣", "台币", "taiwan"] },
+  { value: "AED", flag: AE, keywords: ["aed", "迪拉姆", "阿联酋", "dirham", "阿聯酋"] },
 ];
 
 export type CurrencyData = {
