@@ -25,10 +25,10 @@ const dictionaries: Dictionaries = {
     "help.description": "你可能需要的信息和设置",
     "help.info.title": "信息",
     "help.info.line1": "“兴业寰宇”指由兴业银行发行的“寰宇人生卡”，持卡人可享受结汇购汇交易费率5折优惠。",
-    "help.info.line2": "“银联国际”与“维萨VISA”均为卡组织汇率，仅适用于使用该卡组织所发行银行卡进行的外币交易，不可手动购汇购钞。",
+    "help.info.line2": "“银联国际”为卡组织汇率，仅适用于使用该卡组织所发行银行卡进行的外币交易，不可手动购汇购钞。",
     "help.info.line3": "由于各银行方可能不定期调整数据接口，如您发现某数据源连续多日出现异常，请发送邮件至 noc@sunyz.net 反馈，我们将及时核查与处理。",
     "help.info.line4": "点击货币选择栏右侧的刷新按钮可强制更新各银行汇率。为保证服务稳定，请勿频繁点击。",
-    "help.info.line5.prefix": "使用本服务即表示你已阅读并同意我们的",
+    "help.info.line5.prefix": "使用本服务即表示您已阅读并同意我们的",
     "help.info.line5.link": "服务条款",
     "help.info.line5.suffix": "。",
     // Footer
