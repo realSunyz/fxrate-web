@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from "@/components/animate-ui/components/radix/dialog";
 import { useI18n } from "@/lib/i18n";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -71,7 +71,7 @@ export function SettingsDialog() {
           <CircleQuestionMark className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent style={{ x: "-50%", y: "-50%" }}>
         <DialogHeader>
           <DialogTitle>{t("help.title")}</DialogTitle>
           <DialogDescription>{t("help.description")}</DialogDescription>
@@ -139,7 +139,6 @@ export function SettingsDialog() {
             </div>
           </div>
         </div>
-        
       </DialogContent>
     </Dialog>
   );
