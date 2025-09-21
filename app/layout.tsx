@@ -14,6 +14,10 @@ const rawCaptchaProvider =
   (process.env.NEXT_PUBLIC_CAPTCHA_PROVIDER ?? "turnstile").toLowerCase();
 const captchaProvider =
   rawCaptchaProvider === "recaptcha" ? "recaptcha" : "turnstile";
+const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
+const recaptchaScriptSrc = recaptchaSiteKey
+  ? `https://www.recaptcha.net/recaptcha/api.js?render=${recaptchaSiteKey}`
+  : "https://www.recaptcha.net/recaptcha/api.js";
 
 const PingFangSC = localFont({
   src: [
@@ -75,11 +79,7 @@ export default function RootLayout({
           data-website-id="1931c3e7-60cd-4d04-92d1-e16ee61f5588"
         />
         {captchaProvider === "recaptcha" ? (
-          <script
-            src="https://www.recaptcha.net/recaptcha/api.js?render=explicit"
-            async
-            defer
-          ></script>
+          <script src={recaptchaScriptSrc} async defer></script>
         ) : (
           <script
             src="https://challenges.cloudflare.com/turnstile/v0/api.js"
