@@ -131,6 +131,7 @@ export function CurrencyTable() {
     { countryEligible: boolean; uaEligible: boolean } | null
   >(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [bypassInFlight, setBypassInFlight] = useState(false);
   const { rates, error, loading, refresh } = useFetchRates(fromcurrency, "CNY", authenticated, {
     onAuthExpired: () => {
       setAuthenticated(false);
@@ -239,6 +240,8 @@ export function CurrencyTable() {
     let cancelled = false;
 
     const tryBypass = async () => {
+      if (cancelled) return;
+      setBypassInFlight(true);
       try {
         const resp = await fetch("/api/bypass", {
           method: "GET",
@@ -281,6 +284,7 @@ export function CurrencyTable() {
       } finally {
         if (!cancelled) {
           setBypassAttempted(true);
+          setBypassInFlight(false);
         }
       }
     };
@@ -307,6 +311,11 @@ export function CurrencyTable() {
         <div className="overflow-x-auto rounded-md border">
           <div className="flex items-center justify-center p-6 min-h-[180px]">
             <div className="flex flex-col items-center gap-2">
+              {bypassInFlight && !bypassEligible && (
+                <div className="text-xs text-muted-foreground">
+                  {t("consent.bypassPending")}
+                </div>
+              )}
               {bypassEligible ? (
                 <div className="flex flex-col items-center gap-2 text-xs text-muted-foreground">
                   <div className="text-center">
@@ -353,18 +362,20 @@ export function CurrencyTable() {
                       {authError}
                     </div>
                   )}
-                  <p className="text-xs text-muted-foreground text-center">
-                    {t("consent.agreePrefix")}
-                    {" "}
-                    <a
-                      href="https://sunyz.net/docs/zh-cn/fxrate/tos"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline"
-                    >
-                      {t("consent.policy")}
-                    </a>
-                  </p>
+                  {!bypassInFlight && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      {t("consent.agreePrefix")}
+                      {" "}
+                      <a
+                        href="https://sunyz.net/docs/zh-cn/fxrate/tos"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        {t("consent.policy")}
+                      </a>
+                    </p>
+                  )}
                 </>
               )}
             </div>
