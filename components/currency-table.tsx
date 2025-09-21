@@ -11,7 +11,10 @@ import { SelectCurrency } from "@/components/select-currency";
 import useFetchRates, { CurrencyData, Currencies } from "@/components/fetch";
 import { useI18n, tBankName } from "@/lib/i18n";
 import CaptchaWidget from "@/components/turnstile-widget";
-import { AUTH_SIGNED_PATH } from "@/lib/api";
+import {
+  AUTH_RECAPTCHA_PATH,
+  AUTH_TURNSTILE_PATH,
+} from "@/lib/api";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<CurrencyData>[] => [
@@ -152,12 +155,16 @@ export function CurrencyTable() {
     rawProvider === "recaptcha" ? "recaptcha" : "turnstile";
   const tokenField =
     captchaProvider === "recaptcha" ? "recaptcha-token" : "turnstile-token";
+  const captchaAuthPath =
+    captchaProvider === "recaptcha"
+      ? AUTH_RECAPTCHA_PATH
+      : AUTH_TURNSTILE_PATH;
 
   const onVerifyCaptcha = useCallback(
     async (tk: string) => {
       setAuthError(null);
       try {
-        const resp = await fetch(`${AUTH_SIGNED_PATH}`, {
+        const resp = await fetch(`${captchaAuthPath}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -194,7 +201,7 @@ export function CurrencyTable() {
         setAuthenticated(false);
       }
     },
-    [tokenField]
+    [tokenField, captchaAuthPath]
   );
 
   return (
