@@ -79,10 +79,10 @@ const nextConfig: NextConfig = {
             key: "X-Content-Type-Options",
             value: "nosniff",
           },
-          {
-            key: "Content-Security-Policy",
-            value: cspHeader.replace(/\n/g, ""),
-          },
+          // {
+          //   key: "Content-Security-Policy",
+          //   value: cspHeader.replace(/\n/g, ""),
+          // },
         ],
       },
     ];

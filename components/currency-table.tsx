@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { DataTable } from "@/components/data-table";
 import { SelectCurrency } from "@/components/select-currency";
 import useFetchRates, { CurrencyData, Currencies } from "@/components/fetch";
 import { useI18n, tBankName } from "@/lib/i18n";
-import TurnstileWidget from "@/components/turnstile-widget";
+import CaptchaWidget from "@/components/turnstile-widget";
 import { AUTH_SIGNED_PATH } from "@/lib/api";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -147,44 +147,55 @@ export function CurrencyTable() {
 
   const columns = columnsFactory(t);
 
-  const onVerifyTurnstile = async (tk: string) => {
-    setAuthError(null);
-    try {
-      const resp = await fetch(`${AUTH_SIGNED_PATH}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: tk }),
-        credentials: "include",
-      });
-      if (!resp.ok) {
-        let detail = "";
-        try {
-          const data = await resp.json();
-          detail = typeof data?.error === "string" ? data.error : "";
-        } catch (_) {}
-        const normalized = detail.toLowerCase();
-        if (resp.status === 401 || normalized.includes("token invalid")) {
-          setAuthError("Invalid Token (ERR-T100)");
-        } else if (resp.status === 400) {
-          setAuthError(detail || "Missing Token (ERR-T102)");
-        } else if (resp.status === 403) {
-          setAuthError(detail || "Turnstile Verification Failed (ERR-T103)");
-        } else if (resp.status === 500) {
-          setAuthError(detail || "Server Misconfigured (ERR-T104)");
-        } else {
-          setAuthError(detail || `Auth Failed (ERR-T-RESP${resp.status})`);
+  const rawProvider = (process.env.NEXT_PUBLIC_CAPTCHA_PROVIDER ?? "turnstile").toLowerCase();
+  const captchaProvider: "turnstile" | "recaptcha" =
+    rawProvider === "recaptcha" ? "recaptcha" : "turnstile";
+  const tokenField =
+    captchaProvider === "recaptcha" ? "recaptcha-token" : "turnstile-token";
+
+  const onVerifyCaptcha = useCallback(
+    async (tk: string) => {
+      setAuthError(null);
+      try {
+        const resp = await fetch(`${AUTH_SIGNED_PATH}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ [tokenField]: tk }),
+          credentials: "include",
+        });
+        if (!resp.ok) {
+          let detail = "";
+          try {
+            const data = await resp.json();
+            detail = typeof data?.error === "string" ? data.error : "";
+          } catch (_) {}
+          const normalized = detail.toLowerCase();
+          if (resp.status === 401 || normalized.includes("token invalid")) {
+            setAuthError("Invalid Token (ERR-T100)");
+          } else if (resp.status === 400) {
+            setAuthError(detail || "Missing Token (ERR-T102)");
+          } else if (resp.status === 403) {
+            setAuthError(
+              detail || "Captcha Verification Failed (ERR-T103)"
+            );
+          } else if (resp.status === 500) {
+            setAuthError(detail || "Server Misconfigured (ERR-T104)");
+          } else {
+            setAuthError(detail || `Auth Failed (ERR-T-RESP${resp.status})`);
+          }
+          setAuthenticated(false);
+          return;
         }
+        setAuthenticated(true);
+      } catch (e) {
+        setAuthError("Network Error (ERR-N100)");
         setAuthenticated(false);
-        return;
       }
-      setAuthenticated(true);
-    } catch (e) {
-      setAuthError("Network Error (ERR-N100)");
-      setAuthenticated(false);
-    }
-  };
+    },
+    [tokenField]
+  );
 
   return (
     <>
@@ -201,7 +212,7 @@ export function CurrencyTable() {
         <div className="overflow-x-auto rounded-md border">
           <div className="flex items-center justify-center p-6 min-h-[180px]">
             <div className="flex flex-col items-center gap-2">
-              <TurnstileWidget onVerify={onVerifyTurnstile} />
+              <CaptchaWidget onVerify={onVerifyCaptcha} />
               {authError && (
                 <div className="text-red-500 text-xs">
                   {authError}

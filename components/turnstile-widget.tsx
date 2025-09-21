@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useI18n } from "@/lib/i18n";
 
 declare global {
@@ -20,31 +20,57 @@ declare global {
       ) => string | undefined;
       reset?: (id?: string) => void;
     };
+    grecaptcha?: {
+      ready?: (cb: () => void) => void;
+      render: (
+        el: HTMLElement | string,
+        options: {
+          sitekey: string;
+          callback?: (token: string) => void;
+          "expired-callback"?: () => void;
+          "error-callback"?: () => void;
+          theme?: "light" | "dark";
+          size?: "compact" | "normal" | "invisible";
+        }
+      ) => number;
+      reset?: (id?: number) => void;
+    };
   }
 }
 
-type TurnstileWidgetProps = {
+type CaptchaWidgetProps = {
   onVerify: (token: string) => void;
   siteKey?: string;
   theme?: "auto" | "light" | "dark";
   language?: string;
 };
 
-export function TurnstileWidget({
+export function CaptchaWidget({
   onVerify,
   siteKey,
   theme = "auto",
   language,
-}: TurnstileWidgetProps) {
+}: CaptchaWidgetProps) {
   const { locale } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [widgetId, setWidgetId] = useState<string | undefined>(undefined);
-  const idRef = useRef<string | undefined>(undefined);
+  const idRef = useRef<string | number | undefined>(undefined);
+  const rawProvider = (process.env.NEXT_PUBLIC_CAPTCHA_PROVIDER ?? "turnstile").toLowerCase();
+  const provider: "turnstile" | "recaptcha" =
+    rawProvider === "recaptcha" ? "recaptcha" : "turnstile";
   const resolvedSiteKey =
-    siteKey || process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
-  const resolvedLanguage = language || (locale === "zh" ? "zh-cn" : "en");
+    siteKey ||
+    (provider === "recaptcha"
+      ? process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+      : process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) ||
+    "";
+  const resolvedLanguage =
+    provider === "turnstile"
+      ? language || (locale === "zh" ? "zh-cn" : "en")
+      : undefined;
 
   useEffect(() => {
+    if (provider !== "turnstile") return;
+
     let cancelled = false;
 
     const tryRender = () => {
@@ -64,12 +90,13 @@ export function TurnstileWidget({
         },
         "error-callback": () => {},
         "expired-callback": () => {
-          window.turnstile?.reset?.(id);
+          window.turnstile?.reset?.(
+            typeof id === "string" ? id : undefined
+          );
         },
       });
       const realId = typeof id === "string" ? id : undefined;
       idRef.current = realId;
-      setWidgetId(realId);
     };
 
     const start = Date.now();
@@ -84,9 +111,10 @@ export function TurnstileWidget({
 
     return () => {
       cancelled = true;
+      clearInterval(interval);
       try {
         if (window.turnstile?.reset) {
-          if (idRef.current) {
+          if (typeof idRef.current === "string") {
             window.turnstile.reset(idRef.current);
           } else {
             window.turnstile.reset();
@@ -97,12 +125,79 @@ export function TurnstileWidget({
         if (containerRef.current) containerRef.current.innerHTML = "";
       } catch (_) {}
     };
-  }, [resolvedSiteKey, theme, resolvedLanguage]);
+  }, [provider, resolvedSiteKey, theme, resolvedLanguage, onVerify]);
+
+  useEffect(() => {
+    if (provider !== "recaptcha") return;
+
+    let cancelled = false;
+
+    const renderRecaptcha = () => {
+      if (!containerRef.current || !window.grecaptcha || !resolvedSiteKey) {
+        return;
+      }
+      try {
+        containerRef.current.innerHTML = "";
+      } catch (_) {}
+      const render = () => {
+        if (!containerRef.current || cancelled) return;
+        const id = window.grecaptcha!.render(containerRef.current, {
+          sitekey: resolvedSiteKey,
+          theme: theme === "dark" ? "dark" : "light",
+          callback: (token: string) => {
+            if (!cancelled) onVerify(token);
+          },
+          "expired-callback": () => {
+            if (typeof idRef.current === "number") {
+              window.grecaptcha?.reset?.(idRef.current);
+            } else {
+              window.grecaptcha?.reset?.();
+            }
+          },
+          "error-callback": () => {},
+        });
+        const realId = typeof id === "number" ? id : undefined;
+        idRef.current = realId;
+      };
+
+      if (typeof window.grecaptcha.ready === "function") {
+        window.grecaptcha.ready(render);
+      } else {
+        render();
+      }
+    };
+
+    const start = Date.now();
+    const interval = setInterval(() => {
+      if (window.grecaptcha) {
+        clearInterval(interval);
+        renderRecaptcha();
+      } else if (Date.now() - start > 5000) {
+        clearInterval(interval);
+      }
+    }, 100);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      try {
+        if (typeof idRef.current === "number") {
+          window.grecaptcha?.reset?.(idRef.current);
+        } else {
+          window.grecaptcha?.reset?.();
+        }
+      } catch (_) {}
+      try {
+        if (containerRef.current) containerRef.current.innerHTML = "";
+      } catch (_) {}
+    };
+  }, [provider, resolvedSiteKey, theme, onVerify]);
 
   if (!resolvedSiteKey) {
+    const label = provider === "recaptcha" ? "reCAPTCHA" : "Turnstile";
     return (
       <div className="text-red-500 text-center text-sm text-muted-foreground">
-        Invalid Turnstile Site Key (ERR-C999)
+        {`Invalid ${label} Site Key (ERR-C999)`}
       </div>
     );
   }
@@ -112,4 +207,4 @@ export function TurnstileWidget({
   );
 }
 
-export default TurnstileWidget;
+export default CaptchaWidget;

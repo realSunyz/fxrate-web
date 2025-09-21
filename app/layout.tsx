@@ -10,6 +10,11 @@ import { Footer } from "@/components/footer";
 import { NavBar } from "@/components/navbar";
 import { ThemeSync } from "@/components/theme-sync";
 
+const rawCaptchaProvider =
+  (process.env.NEXT_PUBLIC_CAPTCHA_PROVIDER ?? "turnstile").toLowerCase();
+const captchaProvider =
+  rawCaptchaProvider === "recaptcha" ? "recaptcha" : "turnstile";
+
 const PingFangSC = localFont({
   src: [
     {
@@ -69,11 +74,19 @@ export default function RootLayout({
           src="https://analytics.sunyz.net/script.js"
           data-website-id="1931c3e7-60cd-4d04-92d1-e16ee61f5588"
         />
-        <script
-          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-          async
-          defer
-        ></script>
+        {captchaProvider === "recaptcha" ? (
+          <script
+            src="https://www.recaptcha.net/recaptcha/api.js?render=explicit"
+            async
+            defer
+          ></script>
+        ) : (
+          <script
+            src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+            async
+            defer
+          ></script>
+        )}
       </head>
       <body className={cn("bg-background antialiased", PingFangSC)}>
         <I18nProvider>
