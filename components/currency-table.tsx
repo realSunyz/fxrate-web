@@ -16,6 +16,7 @@ import {
   AUTH_TURNSTILE_PATH,
 } from "@/lib/api";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Checkbox } from "@/components/animate-ui/components/radix/checkbox";
 
 export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<CurrencyData>[] => [
   {
@@ -123,6 +124,12 @@ export function CurrencyTable() {
   const searchParams = useSearchParams();
   const validCodes = useMemo(() => new Set(Currencies.map((c) => c.value)), []);
   const [authenticated, setAuthenticated] = useState(false);
+  const [bypassAttempted, setBypassAttempted] = useState(false);
+  const [bypassEligible, setBypassEligible] = useState(false);
+  const [consentChecked, setConsentChecked] = useState(false);
+  const [bypassMeta, setBypassMeta] = useState<
+    { countryEligible: boolean; uaEligible: boolean } | null
+  >(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const { rates, error, loading, refresh } = useFetchRates(fromcurrency, "CNY", authenticated, {
     onAuthExpired: () => {
@@ -204,6 +211,87 @@ export function CurrencyTable() {
     [tokenField, captchaAuthPath]
   );
 
+  useEffect(() => {
+    if (!bypassEligible) {
+      return;
+    }
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    if (consentChecked) {
+      timer = setTimeout(() => {
+        setAuthenticated(true);
+      }, 1000);
+    } else {
+      setAuthenticated(false);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [bypassEligible, consentChecked]);
+
+  useEffect(() => {
+    if (authenticated || bypassAttempted) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const tryBypass = async () => {
+      try {
+        const resp = await fetch("/api/bypass", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+        const data = await resp.json().catch(() => null);
+        if (cancelled) return;
+
+        const forwarded = Boolean(data?.forwarded);
+        const meta = {
+          countryEligible: Boolean(data?.countryEligible),
+          uaEligible: Boolean(data?.uaEligible),
+        };
+        if (resp.ok && forwarded && data?.eligible) {
+          setAuthError(null);
+          setBypassEligible(true);
+          setConsentChecked(false);
+          setBypassMeta(meta);
+          return;
+        }
+
+        setBypassEligible(false);
+        setBypassMeta(null);
+        if (resp.ok && data?.eligible && data?.backendError) {
+          setAuthError(String(data.backendError));
+        } else if (!resp.ok) {
+          const errorMessage =
+            typeof data?.error === "string"
+              ? data.error
+              : `Bypass Failed (ERR-B${resp.status})`;
+          setAuthError(errorMessage);
+        }
+      } catch (_) {
+        if (!cancelled) {
+          setAuthError((prev) => prev || "Bypass Failed (ERR-B101)");
+          setBypassEligible(false);
+          setBypassMeta(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setBypassAttempted(true);
+        }
+      }
+    };
+
+    tryBypass();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authenticated, bypassAttempted]);
+
   return (
     <>
       <SelectCurrency
@@ -219,24 +307,66 @@ export function CurrencyTable() {
         <div className="overflow-x-auto rounded-md border">
           <div className="flex items-center justify-center p-6 min-h-[180px]">
             <div className="flex flex-col items-center gap-2">
-              <CaptchaWidget onVerify={onVerifyCaptcha} />
-              {authError && (
-                <div className="text-red-500 text-xs">
-                  {authError}
+              {bypassEligible ? (
+                <div className="flex flex-col items-center gap-2 text-xs text-muted-foreground">
+                  <div className="text-center">
+                    {t(
+                      (bypassMeta?.uaEligible
+                        ? "consent.bypassUA"
+                        : "consent.bypassCountry") as string
+                    )}
+                  </div>
+                  <label
+                    htmlFor="consent-checkbox"
+                    className="flex items-center gap-2 text-xs text-muted-foreground"
+                  >
+                    <Checkbox
+                      id="consent-checkbox"
+                      checked={consentChecked}
+                      onCheckedChange={(checked) =>
+                        setConsentChecked(Boolean(checked))
+                      }
+                    />
+                    <span>
+                      {t("consent.agreePrefix")} {" "}
+                      <a
+                        href="https://sunyz.net/docs/zh-cn/fxrate/tos"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        {t("consent.policy")}
+                      </a>
+                    </span>
+                  </label>
+                  {authError && (
+                    <div className="text-red-500 text-xs">
+                      {authError}
+                    </div>
+                  )}
                 </div>
+              ) : (
+                <>
+                  <CaptchaWidget onVerify={onVerifyCaptcha} />
+                  {authError && (
+                    <div className="text-red-500 text-xs">
+                      {authError}
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground text-center">
+                    {t("consent.agreePrefix")}
+                    {" "}
+                    <a
+                      href="https://sunyz.net/docs/zh-cn/fxrate/tos"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      {t("consent.policy")}
+                    </a>
+                  </p>
+                </>
               )}
-              <p className="text-xs text-muted-foreground text-center">
-                {t("consent.agreePrefix")}
-                {" "}
-                <a
-                  href="https://sunyz.net/docs/zh-cn/fxrate/tos"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline"
-                >
-                  {t("consent.policy")}
-                </a>
-              </p>
             </div>
           </div>
         </div>

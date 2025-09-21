@@ -48,6 +48,8 @@ const dictionaries: Dictionaries = {
     // Consent
     "consent.agreePrefix": "使用本服务即视为同意我们的",
     "consent.policy": "服务政策",
+    "consent.bypassCountry": "您正位于中国大陆，验证码已自动跳过",
+    "consent.bypassUA": "您正通过微信访问，验证码已自动跳过",
     // Currency
     "currency.USD": "美元",
     "currency.CAD": "加元",
@@ -113,6 +115,8 @@ const dictionaries: Dictionaries = {
     // Consent
     "consent.agreePrefix": "By using this service, you agree to our",
     "consent.policy": "Terms of Service",
+    "consent.bypassCountry": "You are in Mainland China. Captcha has been bypassed automatically.",
+    "consent.bypassUA": "You are accessing via WeChat. Captcha has been bypassed automatically.",
     // Currency
     "currency.USD": "USD",
     "currency.CAD": "CAD",

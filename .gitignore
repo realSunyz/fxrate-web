@@ -46,3 +46,6 @@ next-env.d.ts
 .AppleDouble
 .LSOverride
 ._*
+
+private_key.pem
+public_key.pem
