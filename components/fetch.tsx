@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import {
   US,
@@ -80,6 +80,9 @@ export type CurrencyData = {
 
 type FetchOptions = {
   onAuthExpired?: () => void;
+  initialRates?: CurrencyData[];
+  preserveInitialData?: boolean;
+  onRatesChange?: (rates: CurrencyData[], loading: boolean) => void;
 };
 
 const useFetchRates = (
@@ -89,9 +92,11 @@ const useFetchRates = (
   options?: FetchOptions
 ) => {
   const { t } = useI18n();
-  const [rates, setRates] = useState<CurrencyData[]>([]);
+  const [rates, setRates] = useState<CurrencyData[]>(() => options?.initialRates ?? []);
   const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(() => !(options?.initialRates && options.initialRates.length > 0));
+  const preserveInitialDataRef = useRef(Boolean(options?.preserveInitialData));
+  const latestOnRatesChange = options?.onRatesChange;
   const fetchAll = (withRefresh: boolean) => {
     if (!authenticated) {
       setRates([]);
@@ -100,17 +105,24 @@ const useFetchRates = (
     }
 
     const bankNames = Object.keys(bankMap);
-    const initialRates: CurrencyData[] = bankNames.map((bank) => ({
-      bank,
-      sellRemit: null,
-      sellCash: null,
-      buyRemit: null,
-      buyCash: null,
-      middle: null,
-      updated: null,
-      hidden: false,
-    }));
-    setRates(initialRates);
+    const shouldPreserveExisting = preserveInitialDataRef.current && !withRefresh && rates.length > 0;
+    if (shouldPreserveExisting) {
+      preserveInitialDataRef.current = false;
+    }
+
+    if (!shouldPreserveExisting) {
+      const initialRates: CurrencyData[] = bankNames.map((bank) => ({
+        bank,
+        sellRemit: null,
+        sellCash: null,
+        buyRemit: null,
+        buyCash: null,
+        middle: null,
+        updated: null,
+        hidden: false,
+      }));
+      setRates(initialRates);
+    }
 
     setLoading(true);
     let loadedCount = 0;
@@ -304,6 +316,10 @@ const useFetchRates = (
   useEffect(() => {
     fetchAll(false);
   }, [fromCurrency, toCurrency, authenticated]);
+
+  useEffect(() => {
+    latestOnRatesChange?.(rates, loading);
+  }, [rates, loading, latestOnRatesChange]);
 
   const refresh = () => fetchAll(true);
 

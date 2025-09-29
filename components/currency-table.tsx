@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
@@ -15,8 +15,10 @@ import {
   AUTH_RECAPTCHA_PATH,
   AUTH_TURNSTILE_PATH,
 } from "@/lib/api";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Checkbox } from "@/components/animate-ui/components/radix/checkbox";
+import { loadCurrencyTableCache, saveCurrencyTableCache } from "@/lib/currency-table-cache";
 
 export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<CurrencyData>[] => [
   {
@@ -40,22 +42,22 @@ export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<Cu
       return value === null ? <Skeleton className="h-4 w-[80px] rounded-full" /> : value;
     },
   },
-  // {
-  //   accessorKey: "sellCash",
-  //   header: ({ column }) => (
-  //     <Button
-  //       variant="ghost"
-  //       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //     >
-  //       购钞价
-  //       <ArrowUpDown className="h-4 w-4" />
-  //     </Button>
-  //   ),
-  //   cell: ({ cell }) => {
-  //     const value = cell.getValue() as number | null;
-  //     return value === null ? <Skeleton className="h-4 w-[80px] rounded-full" /> : value;
-  //   },
-  // },
+  {
+    accessorKey: "sellCash",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        购钞价
+        <ArrowUpDown className="h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ cell }) => {
+      const value = cell.getValue() as number | null;
+      return value === null ? <Skeleton className="h-4 w-[80px] rounded-full" /> : value;
+    },
+  },
   {
     accessorKey: "buyRemit",
     header: ({ column }) => (
@@ -117,19 +119,20 @@ export const columnsFactory = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<Cu
 
 export function CurrencyTable() {
   const { t } = useI18n();
-  const [fromcurrency, setFromcurrency] = useState("USD");
+  const cachedStateRef = useRef(loadCurrencyTableCache());
+  const [fromcurrency, setFromcurrency] = useState(cachedStateRef.current?.fromCurrency ?? "USD");
   const tocurrency = "CNY";
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const validCodes = useMemo(() => new Set(Currencies.map((c) => c.value)), []);
-  const [authenticated, setAuthenticated] = useState(false);
-  const [bypassAttempted, setBypassAttempted] = useState(false);
-  const [bypassEligible, setBypassEligible] = useState(false);
-  const [consentChecked, setConsentChecked] = useState(false);
+  const [authenticated, setAuthenticated] = useState(cachedStateRef.current?.authenticated ?? false);
+  const [bypassAttempted, setBypassAttempted] = useState(cachedStateRef.current?.bypassAttempted ?? false);
+  const [bypassEligible, setBypassEligible] = useState(cachedStateRef.current?.bypassEligible ?? false);
+  const [consentChecked, setConsentChecked] = useState(cachedStateRef.current?.consentChecked ?? false);
   const [bypassMeta, setBypassMeta] = useState<
     { countryEligible: boolean; uaEligible: boolean } | null
-  >(null);
+  >(cachedStateRef.current?.bypassMeta ?? null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [bypassInFlight, setBypassInFlight] = useState(false);
   const { rates, error, loading, refresh } = useFetchRates(fromcurrency, "CNY", authenticated, {
@@ -137,6 +140,8 @@ export function CurrencyTable() {
       setAuthenticated(false);
       setAuthError("Token Expired (ERR-T101)");
     },
+    initialRates: cachedStateRef.current?.rates,
+    preserveInitialData: Boolean(cachedStateRef.current?.rates?.length),
   });
 
   const handleCurrencySelect = (currency: string) => {
@@ -150,11 +155,51 @@ export function CurrencyTable() {
   };
 
   useEffect(() => {
+    try {
+      router.prefetch("/tos");
+    } catch (_) {}
+  }, [router]);
+
+  useEffect(() => {
     const from = searchParams?.get("from");
     if (from && validCodes.has(from) && from !== fromcurrency) {
       setFromcurrency(from);
     }
   }, [searchParams, validCodes]);
+
+  useEffect(() => {
+    if (!consentChecked) {
+      setAuthenticated(false);
+      setBypassEligible(false);
+      setBypassAttempted(false);
+      setBypassMeta(null);
+      setBypassInFlight(false);
+      setAuthError(null);
+    }
+  }, [consentChecked]);
+
+  useEffect(() => {
+    saveCurrencyTableCache({
+      fromCurrency: fromcurrency,
+      authenticated,
+      consentChecked,
+      bypassEligible,
+      bypassAttempted,
+      bypassMeta,
+      rates,
+      loading,
+      timestamp: Date.now(),
+    });
+  }, [
+    fromcurrency,
+    authenticated,
+    consentChecked,
+    bypassEligible,
+    bypassAttempted,
+    bypassMeta,
+    rates,
+    loading,
+  ]);
 
   const columns = columnsFactory(t);
 
@@ -233,7 +278,7 @@ export function CurrencyTable() {
   }, [bypassEligible, consentChecked]);
 
   useEffect(() => {
-    if (authenticated || bypassAttempted) {
+    if (!consentChecked || authenticated || bypassAttempted) {
       return;
     }
 
@@ -259,7 +304,6 @@ export function CurrencyTable() {
         if (resp.ok && forwarded && data?.eligible) {
           setAuthError(null);
           setBypassEligible(true);
-          setConsentChecked(false);
           setBypassMeta(meta);
           return;
         }
@@ -294,7 +338,7 @@ export function CurrencyTable() {
     return () => {
       cancelled = true;
     };
-  }, [authenticated, bypassAttempted]);
+  }, [authenticated, bypassAttempted, consentChecked]);
 
   return (
     <>
@@ -309,74 +353,54 @@ export function CurrencyTable() {
         <DataTable columns={columns} data={rates} />
       ) : (
         <div className="overflow-x-auto rounded-md border">
-          <div className="flex items-center justify-center p-6 min-h-[180px]">
-            <div className="flex flex-col items-center gap-2">
-              {bypassInFlight && !bypassEligible && (
-                <div className="text-xs text-muted-foreground">
-                  {t("consent.bypassPending")}
-                </div>
+          <div className="flex items-center justify-center p-6 min-h-[200px]">
+            <div className="flex flex-col items-center gap-3 text-xs text-muted-foreground">
+              <label
+                htmlFor="consent-checkbox"
+                className="flex items-center gap-2 text-xs text-muted-foreground"
+              >
+                <Checkbox
+                  id="consent-checkbox"
+                  checked={consentChecked}
+                  onCheckedChange={(checked) => setConsentChecked(Boolean(checked))}
+                />
+                <span>
+                  {t("consent.agreePrefix")} {" "}
+                  <Link href="/tos" className="underline transition-colors hover:text-primary">
+                    {t("consent.policy")}
+                  </Link>
+                </span>
+              </label>
+              {!consentChecked && (
+                <p className="text-center text-xs text-muted-foreground">
+                  {t("consent.agreeConfirm")}
+                </p>
               )}
-              {bypassEligible ? (
-                <div className="flex flex-col items-center gap-2 text-xs text-muted-foreground">
-                  <div className="text-center">
-                    {t(
-                      (bypassMeta?.uaEligible
-                        ? "consent.bypassUA"
-                        : "consent.bypassCountry") as string
-                    )}
-                  </div>
-                  <label
-                    htmlFor="consent-checkbox"
-                    className="flex items-center gap-2 text-xs text-muted-foreground"
-                  >
-                    <Checkbox
-                      id="consent-checkbox"
-                      checked={consentChecked}
-                      onCheckedChange={(checked) =>
-                        setConsentChecked(Boolean(checked))
-                      }
-                    />
-                    <span>
-                      {t("consent.agreePrefix")} {" "}
-                      <a
-                        href="https://sunyz.net/docs/zh-cn/fxrate/tos"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline"
-                      >
-                        {t("consent.policy")}
-                      </a>
-                    </span>
-                  </label>
+              {consentChecked && (
+                <div className="flex flex-col items-center gap-2">
+                  {bypassInFlight && (
+                    <div className="text-center text-xs text-muted-foreground">
+                      {t("consent.bypassPending")}
+                    </div>
+                  )}
+                  {bypassEligible && !bypassInFlight && (
+                    <div className="text-center text-xs text-muted-foreground">
+                      {t(
+                        (bypassMeta?.uaEligible
+                          ? "consent.bypassUA"
+                          : "consent.bypassCountry") as string
+                      )}
+                    </div>
+                  )}
+                  {!bypassEligible && !bypassInFlight && bypassAttempted && (
+                    <CaptchaWidget onVerify={onVerifyCaptcha} />
+                  )}
                   {authError && (
-                    <div className="text-red-500 text-xs">
+                    <div className="text-red-500 text-xs text-center">
                       {authError}
                     </div>
                   )}
                 </div>
-              ) : (
-                <>
-                  <CaptchaWidget onVerify={onVerifyCaptcha} />
-                  {authError && (
-                    <div className="text-red-500 text-xs">
-                      {authError}
-                    </div>
-                  )}
-                  {!bypassInFlight && (
-                    <p className="text-xs text-muted-foreground text-center">
-                      {t("consent.agreePrefix")}
-                      {" "}
-                      <a
-                        href="https://sunyz.net/docs/zh-cn/fxrate/tos"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline"
-                      >
-                        {t("consent.policy")}
-                      </a>
-                    </p>
-                  )}
-                </>
               )}
             </div>
           </div>

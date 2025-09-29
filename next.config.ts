@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
+import createMDX from "@next/mdx";
 
 const { execSync } = require("child_process");
 const pkg = require("./package.json");
+
+const withMDX = createMDX({
+  extension: /\.mdx?$/,
+});
 
 function resolveCommitId(): string {
   try {
@@ -89,4 +94,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withMDX(nextConfig);
