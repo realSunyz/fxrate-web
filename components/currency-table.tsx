@@ -10,7 +10,7 @@ import { DataTable } from "@/components/data-table";
 import { SelectCurrency } from "@/components/select-currency";
 import useFetchRates, { CurrencyData, Currencies } from "@/components/fetch";
 import { useI18n, tBankName } from "@/lib/i18n";
-import CaptchaWidget from "@/components/turnstile-widget";
+import CaptchaWidget from "@/components/captcha-widget";
 import {
   AUTH_RECAPTCHA_PATH,
   AUTH_TURNSTILE_PATH,
