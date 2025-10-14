@@ -114,6 +114,7 @@ export function SelectCurrency({ onSelect, disabled = false, onRefresh, value: c
                     <CommandItem
                       key={item.value}
                       value={item.value}
+                      keywords={item.keywords}
                       onSelect={(currentValue) => handleSelect(currentValue)}
                     >
                       <item.flag className="mr-2 h-4 w-4" />
