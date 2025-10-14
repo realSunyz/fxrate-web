@@ -31,6 +31,7 @@ export const bankMap: { [key: string]: string } = {
   citiccn: "citic.cn",
   hsbccn: "hsbc.cn",
   upi: "unionpay",
+  pboc: "pboc",
   //  visa: "visa",
 };
 

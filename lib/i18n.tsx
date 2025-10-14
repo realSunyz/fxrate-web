@@ -76,6 +76,7 @@ const dictionaries: Dictionaries = {
     "bank.citiccn": "中信银行",
     "bank.hsbccn": "汇丰中国",
     "bank.upi": "银联国际",
+    "bank.pboc": "人民银行",
     "bank.visa": "维萨VISA",
   },
   en: {
@@ -142,6 +143,7 @@ const dictionaries: Dictionaries = {
     "bank.citiccn": "CITIC CN",
     "bank.hsbccn": "HSBC CN",
     "bank.upi": "UnionPay",
+    "bank.pboc": "PBOC",
     "bank.visa": "VISA",
   },
 };
