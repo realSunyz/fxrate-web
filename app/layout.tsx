@@ -74,10 +74,6 @@ export default function RootLayout({
     <html lang="zh-Hans" suppressHydrationWarning>
       <head>
         <Script src="https://cdn.sunyz.net/assets/fxrate/themeScript.js" />
-        <Script
-          src="https://analytics.sunyz.net/script.js"
-          data-website-id="1931c3e7-60cd-4d04-92d1-e16ee61f5588"
-        />
         {captchaProvider === "recaptcha" ? (
           <script src={recaptchaScriptSrc} async defer></script>
         ) : (
